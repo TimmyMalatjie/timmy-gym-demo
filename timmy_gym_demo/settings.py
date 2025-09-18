@@ -25,6 +25,15 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.railway.app', 'timmy-gym-demo-production.up.railway.app']
 
+# CSRF trusted origins for Railway
+CSRF_TRUSTED_ORIGINS = [
+    'https://timmy-gym-demo-production.up.railway.app',
+    'http://timmy-gym-demo-production.up.railway.app'
+]
+
+# For Railway's HTTPS redirect
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -112,10 +121,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files
 MEDIA_URL = '/media/'
