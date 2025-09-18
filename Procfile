@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn timmy_gym_demo.wsgi:application --bind 0.0.0.0:$PORT
+web: gunicorn timmy_gym_demo.wsgi
