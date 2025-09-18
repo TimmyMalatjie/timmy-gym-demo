@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Join the Elite - Timmy's Gym{% endblock %}
+
+{% block content %}
+<!-- REGISTRATION HERO SECTION -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="hero-title">JOIN THE <span class="text-secondary-custom">ELITE</span></h1>
+                <p class="hero-subtitle">Create your account and start your transformation journey today</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- REGISTRATION FORM SECTION -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary-custom text-white text-center py-4">
+                        <h3 class="mb-0">🎮 Create Player Profile</h3>
+                        <p class="mb-0 opacity-75">Build your champion character</p>
+                    </div>
+                    <div class="card-body p-5">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Display form errors -->
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <h6><i class="fas fa-exclamation-triangle"></i> Character Creation Failed:</h6>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <small class="d-block">{{ error }}</small>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Basic Player Info -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.first_name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.last_name|as_crispy_field }}
+                                </div>
+                            </div>
+
+                            {{ form.username|as_crispy_field }}
+                            {{ form.email|as_crispy_field }}
+
+                            <!-- Password Fields -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.password1|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.password2|as_crispy_field }}
+                                </div>
+                            </div>
+
+                            <!-- Terms Agreement -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" class="text-primary-custom">Terms of Service</a> 
+                                    and <a href="#" class="text-primary-custom">Privacy Policy</a>
+                                </label>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-secondary-custom w-100 py-3 fw-bold">
+                                🚀 CREATE MY ACCOUNT
+                            </button>
+                        </form>
+
+                        <!-- Login Link -->
+                        <div class="text-center mt-4">
+                            <p class="mb-0">Already have an account?</p>
+                            <a href="{% url 'accounts:login' %}" class="text-primary-custom fw-bold">Login to Your Account</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MEMBERSHIP PREVIEW SECTION -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="text-primary-custom mb-4">Choose Your Path After Registration</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-card h-100">
+                            <div class="feature-icon">🥉</div>
+                            <h5 class="feature-title">Basic Warrior</h5>
+                            <p class="text-secondary-custom fw-bold">R299/month</p>
+                            <p>Perfect for beginners starting their fitness journey</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card h-100">
+                            <div class="feature-icon">🥈</div>
+                            <h5 class="feature-title">Elite Fighter</h5>
+                            <p class="text-secondary-custom fw-bold">R599/month</p>
+                            <p>For serious athletes and MMA enthusiasts</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card h-100">
+                            <div class="feature-icon">🥇</div>
+                            <h5 class="feature-title">Champion Access</h5>
+                            <p class="text-secondary-custom fw-bold">R999/month</p>
+                            <p>Premium membership with personal training</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

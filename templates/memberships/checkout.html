@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Checkout - {{ plan.name }} - Timmy's Gym{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="bg-primary-custom text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="mb-1">Secure Checkout</h2>
+                <p class="mb-0 opacity-75">Complete your {{ plan.name }} membership purchase</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="progress bg-light" style="height: 8px;">
+                    <div class="progress-bar bg-secondary-custom" style="width: 75%"></div>
+                </div>
+                <small class="mt-1 d-block">Step 2 of 3</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <!-- LEFT COLUMN - ORDER SUMMARY -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-lg sticky-top">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-1">{{ plan.name }}</h6>
+                                <small class="text-muted">Monthly Membership</small>
+                            </div>
+                            <span class="fw-bold">R{{ monthly_cost }}</span>
+                        </div>
+                        
+                        {% if plan.setup_fee > 0 %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="mb-1">Setup Fee</h6>
+                                    <small class="text-muted">One-time charge</small>
+                                </div>
+                                <span class="fw-bold">R{{ setup_fee }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-bold">Total Due Today:</span>
+                            <span class="fw-bold text-primary-custom h5 mb-0">R{{ total_cost }}</span>
+                        </div>
+                        
+                        <div class="bg-light rounded p-3 mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Your membership will auto-renew monthly at R{{ monthly_cost }} until cancelled.
+                            </small>
+                        </div>
+                        
+                        <!-- BILLING CYCLE INFO -->
+                        <div class="mb-3">
+                            <h6 class="mb-2">Billing Details:</h6>
+                            <small class="text-muted d-block">Billing Cycle: {{ purchase_data.billing_cycle|title }}</small>
+                            <small class="text-muted d-block">Start Date: {% if purchase_data.start_immediately %}Today{% else %}{{ start_date }}{% endif %}</small>
+                        </div>
+                        
+                        <!-- SECURITY BADGES -->
+                        <div class="text-center mt-4">
+                            <div class="d-flex justify-content-center gap-3 text-muted">
+                                <div class="text-center">
+                                    <i class="fas fa-lock fa-2x mb-1"></i>
+                                    <small class="d-block">SSL Secured</small>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-shield-alt fa-2x mb-1"></i>
+                                    <small class="d-block">Privacy Protected</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RIGHT COLUMN - PAYMENT FORM -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow">
+                    <div class="card-header">
+                        <h4 class="mb-0">Payment Information</h4>
+                        <small class="text-muted">This is a demo payment form - no real charges will be made</small>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" id="checkout-form">
+                            {% csrf_token %}
+                            
+                            <!-- DEMO NOTICE -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Demo Mode:</strong> Use card number <code>4111 1111 1111 1111</code> for successful payment or <code>4000 0000 0000 0000</code> for payment failure.
+                            </div>
+                            
+                            <!-- PERSONAL INFORMATION -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="text-primary-custom mb-3">Contact Information</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    {{ billing_form.full_name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ billing_form.email|as_crispy_field }}
+                                </div>
+                            </div>
+                            
+                            <!-- PAYMENT DETAILS -->
+                            <div class="mb-4">
+                                <h5 class="text-primary-custom mb-3">Payment Details</h5>
+                                
+                                <div class="mb-3">
+                                    {{ billing_form.card_number|as_crispy_field }}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        {{ billing_form.expiry_month|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ billing_form.expiry_year|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ billing_form.cvv|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- BILLING ADDRESS -->
+                            <div class="mb-4">
+                                <h5 class="text-primary-custom mb-3">Billing Address</h5>
+                                
+                                <div class="mb-3">
+                                    {{ billing_form.address_line1|as_crispy_field }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ billing_form.address_line2|as_crispy_field }}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        {{ billing_form.city|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ billing_form.province|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ billing_form.postal_code|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- FINAL CONFIRMATION -->
+                            <div class="mb-4">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="confirm-purchase" required>
+                                            <label class="form-check-label" for="confirm-purchase">
+                                                I confirm that I want to purchase the <strong>{{ plan.name }}</strong> membership for <strong>R{{ total_cost }}</strong> and authorize this payment.
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- ACTION BUTTONS -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                <a href="{% url 'memberships:purchase' plan.id %}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </a>
+                                <button type="submit" class="btn btn-secondary-custom btn-lg" id="submit-payment">
+                                    <span id="button-text">Complete Purchase</span>
+                                    <span id="button-spinner" class="d-none">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Processing...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- SUPPORT INFO -->
+                <div class="mt-4 text-center">
+                    <p class="text-muted">
+                        <i class="fas fa-headset me-2"></i>
+                        Need help? Contact our support team at 
+                        <a href="mailto:support@timmysgym.co.za">support@timmysgym.co.za</a>
+                        or call <a href="tel:+27123456789">+27 12 345 6789</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROCESSING MODAL -->
+<div class="modal fade" id="processingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+                <h5>Processing Your Payment</h5>
+                <p class="text-muted mb-0">Please wait while we process your membership purchase...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    // Show processing UI
+    const submitBtn = document.getElementById('submit-payment');
+    const buttonText = document.getElementById('button-text');
+    const buttonSpinner = document.getElementById('button-spinner');
+    
+    buttonText.classList.add('d-none');
+    buttonSpinner.classList.remove('d-none');
+    submitBtn.disabled = true;
+    
+    // Show processing modal after a brief delay
+    setTimeout(() => {
+        const modal = new bootstrap.Modal(document.getElementById('processingModal'));
+        modal.show();
+    }, 500);
+});
+</script>
+{% endblock %}

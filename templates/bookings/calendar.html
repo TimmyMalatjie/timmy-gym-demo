@@ -1,0 +1,595 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Arena - Choose Your Battle{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-arena {
+        background: linear-gradient(135deg, #0047A3 0%, #1a5cb8 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .service-card {
+        border: 2px solid #0047A3;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        background: white;
+        cursor: pointer;
+        height: 100%;
+    }
+    
+    .service-card:hover, .service-card.selected {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 71, 163, 0.3);
+        border-color: #F96610;
+    }
+    
+    .service-card.selected {
+        background: linear-gradient(145deg, #fff5f0, #ffffff);
+    }
+    
+    .service-icon {
+        font-size: 3rem;
+        color: #F96610;
+        margin-bottom: 1rem;
+    }
+    
+    .availability-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+    
+    .time-slot {
+        padding: 1rem;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+        position: relative;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .time-slot:hover {
+        border-color: #F96610;
+        background: #fff5f0;
+        transform: translateY(-2px);
+    }
+    
+    .time-slot.available {
+        border-color: #28a745;
+        background: #f8fff9;
+    }
+    
+    .time-slot.selected {
+        border-color: #F96610;
+        background: #F96610;
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    .time-slot.booked {
+        background: #f8f9fa;
+        color: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    
+    .time-slot.booked::after {
+        content: "BOOKED";
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 0.7rem;
+        background: #dc3545;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+    
+    .trainer-selector {
+        background: linear-gradient(45deg, #f8f9fa, #ffffff);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+    }
+    
+    .trainer-card {
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .trainer-card:hover, .trainer-card.selected {
+        border-color: #F96610;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(249, 102, 16, 0.3);
+    }
+    
+    .trainer-card.selected {
+        border-color: #28a745;
+        background: linear-gradient(145deg, #f8fff9, #ffffff);
+    }
+    
+    .progress-bar-gaming {
+        height: 20px;
+        background: linear-gradient(90deg, #0047A3, #F96610);
+        border-radius: 10px;
+    }
+    
+    .booking-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 2rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .progress-step {
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 50px;
+        min-width: 120px;
+    }
+    
+    .progress-step.active {
+        background: #F96610;
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background: #28a745;
+        color: white;
+    }
+    
+    .spinner-container {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .booking-summary {
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        padding: 1.5rem;
+        border-radius: 10px;
+        border-left: 4px solid #F96610;
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="booking-arena">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Choose Your Training Battle</h1>
+        <p class="lead">Select your service, pick your time, and level up your fitness journey!</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Progress Indicator -->
+    <div class="booking-progress">
+        <div class="progress-step active" id="step-service">1. Choose Service</div>
+        <div class="progress-step" id="step-date">2. Select Date</div>
+        <div class="progress-step" id="step-time">3. Pick Time</div>
+        <div class="progress-step" id="step-trainer">4. Choose Trainer</div>
+        <div class="progress-step" id="step-confirm">5. Confirm</div>
+    </div>
+
+    <!-- Service Selection -->
+    <div class="row mb-5" id="service-section">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Select Your Training Mode</h2>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="service-card p-4 text-center" onclick="selectService(1, 'Personal Training', 60, 299)">
+                <div class="service-icon">🥊</div>
+                <h5 class="fw-bold">Personal Training</h5>
+                <p class="text-muted">One-on-one coaching with elite trainers</p>
+                <div class="mb-3">
+                    <span class="badge bg-primary">60 mins</span>
+                    <span class="badge bg-success">R299</span>
+                </div>
+                <div class="btn btn-outline-primary">SELECT BATTLE</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="service-card p-4 text-center" onclick="selectService(2, 'Group Class', 45, 149)">
+                <div class="service-icon">💥</div>
+                <h5 class="fw-bold">Group Classes</h5>
+                <p class="text-muted">High-energy group training sessions</p>
+                <div class="mb-3">
+                    <span class="badge bg-primary">45 mins</span>
+                    <span class="badge bg-success">R149</span>
+                </div>
+                <div class="btn btn-outline-primary">SELECT BATTLE</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="service-card p-4 text-center" onclick="selectService(3, 'MMA Training', 90, 399)">
+                <div class="service-icon">🥋</div>
+                <h5 class="fw-bold">MMA Training</h5>
+                <p class="text-muted">Mixed martial arts and combat training</p>
+                <div class="mb-3">
+                    <span class="badge bg-primary">90 mins</span>
+                    <span class="badge bg-success">R399</span>
+                </div>
+                <div class="btn btn-outline-primary">SELECT BATTLE</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="service-card p-4 text-center" onclick="selectService(4, 'Assessment', 30, 199)">
+                <div class="service-icon">📊</div>
+                <h5 class="fw-bold">Fitness Assessment</h5>
+                <p class="text-muted">Complete fitness evaluation and planning</p>
+                <div class="mb-3">
+                    <span class="badge bg-primary">30 mins</span>
+                    <span class="badge bg-success">R199</span>
+                </div>
+                <div class="btn btn-outline-primary">SELECT BATTLE</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendar Section -->
+    <div class="row fade-in" id="calendar-section" style="display: none;">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Choose Your Battle Date</h3>
+            
+            <!-- Date Picker -->
+            <div class="text-center mb-4">
+                <input type="date" id="battle-date" class="form-control d-inline-block w-auto form-control-lg" 
+                       onchange="loadAvailability()">
+            </div>
+            
+            <!-- Available Time Slots -->
+            <div id="availability-container">
+                <div class="availability-grid" id="time-slots">
+                    <!-- Time slots loaded via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trainer Selection -->
+    <div class="row fade-in" id="trainer-section" style="display: none;">
+        <div class="col-12">
+            <div class="trainer-selector">
+                <h4 class="text-center mb-4">Choose Your Training Master</h4>
+                <div class="row" id="trainer-options">
+                    <!-- Trainers loaded via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Booking Confirmation -->
+    <div class="row fade-in" id="booking-form" style="display: none;">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Confirm Your Battle Booking</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'bookings:booking_create' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Hidden fields populated by JavaScript -->
+                        <input type="hidden" id="selected-service" name="service" value="">
+                        <input type="hidden" id="selected-date" name="date" value="">
+                        <input type="hidden" id="selected-time" name="time" value="">
+                        <input type="hidden" id="selected-trainer" name="trainer" value="">
+                        
+                        <!-- Booking Summary -->
+                        <div class="booking-summary mb-4">
+                            <h5>Battle Summary:</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Service:</strong> <span id="summary-service">-</span></li>
+                                <li><strong>Date:</strong> <span id="summary-date">-</span></li>
+                                <li><strong>Time:</strong> <span id="summary-time">-</span></li>
+                                <li><strong>Trainer:</strong> <span id="summary-trainer">-</span></li>
+                                <li><strong>Duration:</strong> <span id="summary-duration">-</span> minutes</li>
+                                <li><strong>Price:</strong> R<span id="summary-price">0</span></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Additional Notes -->
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Battle Notes (Optional):</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                    placeholder="Any special requests or goals for this session..."></textarea>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <button type="button" class="btn btn-secondary" onclick="resetBooking()">
+                                Start Over
+                            </button>
+                            <button type="submit" class="btn btn-success btn-lg pulse">
+                                CONFIRM BATTLE BOOKING
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Interactive Booking -->
+<script>
+let selectedService = null;
+let selectedServiceName = null;
+let selectedServiceDuration = null;
+let selectedServicePrice = null;
+let selectedDate = null;
+let selectedTime = null;
+let selectedTrainer = null;
+let selectedTrainerName = null;
+
+function updateProgress(step) {
+    const steps = ['step-service', 'step-date', 'step-time', 'step-trainer', 'step-confirm'];
+    const currentIndex = steps.indexOf(`step-${step}`);
+    
+    steps.forEach((stepId, index) => {
+        const element = document.getElementById(stepId);
+        element.classList.remove('active', 'completed');
+        
+        if (index < currentIndex) {
+            element.classList.add('completed');
+        } else if (index === currentIndex) {
+            element.classList.add('active');
+        }
+    });
+}
+
+function selectService(serviceId, serviceName, duration, price) {
+    // Remove previous selection
+    document.querySelectorAll('.service-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selection to clicked card
+    event.target.closest('.service-card').classList.add('selected');
+    
+    selectedService = serviceId;
+    selectedServiceName = serviceName;
+    selectedServiceDuration = duration;
+    selectedServicePrice = price;
+    
+    document.getElementById('selected-service').value = serviceId;
+    document.getElementById('summary-service').textContent = serviceName;
+    document.getElementById('summary-duration').textContent = duration;
+    document.getElementById('summary-price').textContent = price;
+    
+    updateProgress('date');
+    
+    // Set minimum date to today
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 30);
+    
+    document.getElementById('battle-date').min = today.toISOString().split('T')[0];
+    document.getElementById('battle-date').max = maxDate.toISOString().split('T')[0];
+    
+    document.getElementById('calendar-section').style.display = 'block';
+    setTimeout(() => {
+        document.getElementById('calendar-section').scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+}
+
+function loadAvailability() {
+    const date = document.getElementById('battle-date').value;
+    if (!date || !selectedService) return;
+    
+    selectedDate = date;
+    document.getElementById('selected-date').value = date;
+    document.getElementById('summary-date').textContent = new Date(date).toLocaleDateString('en-ZA');
+    
+    updateProgress('time');
+    
+    // Show loading spinner
+    const timeSlotsContainer = document.getElementById('time-slots');
+    timeSlotsContainer.innerHTML = `
+        <div class="spinner-container">
+            <div class="spinner-border text-primary mb-3"></div>
+            <p>Loading battle times...</p>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        loadTimeSlots();
+    }, 1000);
+}
+
+function loadTimeSlots() {
+    // Generate realistic time slots based on service type
+    const timeSlots = generateTimeSlots();
+    
+    const container = document.getElementById('time-slots');
+    container.innerHTML = '';
+    
+    timeSlots.forEach(slot => {
+        const timeSlotDiv = document.createElement('div');
+        timeSlotDiv.className = `time-slot ${slot.available ? 'available' : 'booked'}`;
+        timeSlotDiv.innerHTML = `
+            <div class="fw-bold">${slot.time}</div>
+            <div class="small">${slot.available ? '✅ Available' : '❌ Booked'}</div>
+            ${slot.trainer && slot.available ? `<div class="small text-muted">${slot.trainer}</div>` : ''}
+        `;
+        
+        if (slot.available) {
+            timeSlotDiv.onclick = () => selectTime(slot.time);
+        }
+        
+        container.appendChild(timeSlotDiv);
+    });
+}
+
+function generateTimeSlots() {
+    const slots = [];
+    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+    const trainers = ['Available', 'Timmy J.', 'Sarah S.', 'Mike L.'];
+    
+    times.forEach(time => {
+        const available = Math.random() > 0.3; // 70% chance of being available
+        slots.push({
+            time: time,
+            available: available,
+            trainer: available ? trainers[Math.floor(Math.random() * trainers.length)] : null
+        });
+    });
+    
+    return slots;
+}
+
+function selectTime(time) {
+    // Remove previous selection
+    document.querySelectorAll('.time-slot').forEach(slot => {
+        slot.classList.remove('selected');
+    });
+    
+    // Add selection to clicked slot
+    event.target.closest('.time-slot').classList.add('selected');
+    
+    selectedTime = time;
+    document.getElementById('selected-time').value = time;
+    document.getElementById('summary-time').textContent = time;
+    
+    updateProgress('trainer');
+    
+    setTimeout(() => {
+        loadTrainers();
+        document.getElementById('trainer-section').style.display = 'block';
+        document.getElementById('trainer-section').scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+}
+
+function loadTrainers() {
+    // Sample trainers with realistic data
+    const trainers = [
+        { 
+            id: 1, 
+            name: 'Timmy "The Beast" Johnson', 
+            specialization: 'MMA & Strength Training', 
+            rating: 5,
+            experience: '8 years',
+            available: true
+        },
+        { 
+            id: 2, 
+            name: 'Sarah "Iron Will" Smith', 
+            specialization: 'Personal Training & Nutrition', 
+            rating: 5,
+            experience: '6 years',
+            available: true
+        },
+        { 
+            id: 3, 
+            name: 'Mike "Lightning" Lee', 
+            specialization: 'Boxing & Cardio', 
+            rating: 4,
+            experience: '4 years',
+            available: Math.random() > 0.3
+        }
+    ];
+    
+    const container = document.getElementById('trainer-options');
+    container.innerHTML = '';
+    
+    trainers.forEach(trainer => {
+        const trainerDiv = document.createElement('div');
+        trainerDiv.className = 'col-md-4 mb-3';
+        trainerDiv.innerHTML = `
+            <div class="trainer-card card ${trainer.available ? '' : 'opacity-50'}" 
+                 ${trainer.available ? `onclick="selectTrainer(${trainer.id}, '${trainer.name}')"` : ''}>
+                <div class="card-body text-center">
+                    <h6 class="fw-bold">${trainer.name}</h6>
+                    <p class="small text-muted">${trainer.specialization}</p>
+                    <p class="small">${trainer.experience} experience</p>
+                    <div class="text-warning mb-2">
+                        ${'⭐'.repeat(trainer.rating)}
+                    </div>
+                    <div class="badge ${trainer.available ? 'bg-success' : 'bg-secondary'}">
+                        ${trainer.available ? 'Available' : 'Unavailable'}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(trainerDiv);
+    });
+}
+
+function selectTrainer(trainerId, trainerName) {
+    // Remove previous selection
+    document.querySelectorAll('.trainer-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selection to clicked card
+    event.target.closest('.trainer-card').classList.add('selected');
+    
+    selectedTrainer = trainerId;
+    selectedTrainerName = trainerName;
+    document.getElementById('selected-trainer').value = trainerId;
+    document.getElementById('summary-trainer').textContent = trainerName;
+    
+    updateProgress('confirm');
+    
+    setTimeout(() => {
+        document.getElementById('booking-form').style.display = 'block';
+        document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+}
+
+function resetBooking() {
+    if (confirm('Are you sure you want to start over?')) {
+        location.reload();
+    }
+}
+
+// Initialize date picker with today's date
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    
+    document.getElementById('battle-date').value = tomorrow.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

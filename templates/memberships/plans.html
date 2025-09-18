@@ -1,0 +1,241 @@
+<!-- templates/memberships/plans.html - Fixed Template -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Membership Plans - Timmy's Gym{% endblock %}
+
+{% block extra_css %}
+<style>
+    .membership-store {
+        background: linear-gradient(135deg, #0047A3 0%, #1a5cb8 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+    }
+    
+    .plan-card {
+        border: 3px solid transparent;
+        border-radius: 20px;
+        background: white;
+        transition: all 0.4s ease;
+        position: relative;
+        height: 100%;
+    }
+    
+    .plan-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 71, 163, 0.3);
+        border-color: #F96610;
+    }
+    
+    .plan-featured {
+        border-color: #F96610;
+        position: relative;
+    }
+    
+    .plan-featured::after {
+        content: '⭐ MOST POPULAR';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #F96610;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .plan-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .warrior-icon { color: #28a745; }
+    .fighter-icon { color: #F96610; }
+    .champion-icon { color: #ffd700; }
+    
+    .price-display {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #0047A3;
+        margin: 1rem 0;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .feature-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .feature-included { color: #28a745; }
+    .feature-excluded { color: #dc3545; opacity: 0.5; }
+    
+    .upgrade-button {
+        background: linear-gradient(45deg, #0047A3, #1a5cb8);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+        padding: 1rem 2rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .upgrade-button:hover {
+        background: linear-gradient(45deg, #F96610, #fd7e14);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="membership-store">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold">Membership Store</h1>
+        <p class="lead fs-4">Choose your membership tier and unlock your training potential!</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Membership Plans -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="display-5 fw-bold">Select Your Membership Level</h2>
+            <p class="lead text-muted">Each membership tier unlocks new training opportunities</p>
+        </div>
+        
+        {% for plan in plans %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="plan-card {% if forloop.counter == 2 %}plan-featured{% endif %} p-4">
+                <div class="text-center">
+                    {% if forloop.first %}
+                        <span class="plan-icon warrior-icon">🛡️</span>
+                        <h3 class="fw-bold text-success">{{ plan.name|upper }}</h3>
+                    {% elif forloop.counter == 2 %}
+                        <span class="plan-icon fighter-icon">⚔️</span>
+                        <h3 class="fw-bold text-warning">{{ plan.name|upper }}</h3>
+                    {% else %}
+                        <span class="plan-icon champion-icon">👑</span>
+                        <h3 class="fw-bold" style="color: #ffd700;">{{ plan.name|upper }}</h3>
+                    {% endif %}
+                    
+                    <div class="price-display">R{{ plan.monthly_price }}</div>
+                    <p class="small text-muted">per month</p>
+                </div>
+                
+                <!-- Features List -->
+                <ul class="feature-list">
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        24/7 Gym Access
+                    </li>
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {% if plan.group_classes_included == 0 %}Unlimited{% else %}{{ plan.group_classes_included }}{% endif %} Group Classes/Month
+                    </li>
+                    {% if plan.personal_training_sessions > 0 %}
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ plan.personal_training_sessions }} Personal Training Sessions
+                    </li>
+                    {% else %}
+                    <li class="feature-excluded">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Personal Training Sessions
+                    </li>
+                    {% endif %}
+                    
+                    {% if plan.monthly_price > 800 %}
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        MMA Training Access
+                    </li>
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Nutrition Consultation
+                    </li>
+                    {% else %}
+                    <li class="feature-excluded">
+                        <i class="fas fa-times-circle me-2"></i>
+                        MMA Training Access
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Action Button -->
+                <div class="text-center mt-4">
+                    {% if user_has_membership and current_membership.plan.id == plan.id %}
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-crown me-2"></i>CURRENT PLAN
+                        </button>
+                    {% elif user_has_membership and current_membership.plan.monthly_price < plan.monthly_price %}
+                        <a href="{% url 'memberships:membership_upgrade' plan.id %}" class="upgrade-button">
+                            <i class="fas fa-arrow-up me-2"></i>UPGRADE TO {{ plan.name|upper }}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'memberships:membership_purchase' plan.id %}" class="upgrade-button">
+                            <i class="fas fa-rocket me-2"></i>SELECT {{ plan.name|upper }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-warning">
+                <h4>Store Under Construction</h4>
+                <p>Membership plans are being configured. Check back soon!</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="text-center mb-5">
+        <div class="bg-primary text-white rounded-4 p-5">
+            <h2 class="fw-bold mb-3">Ready to Start Your Transformation?</h2>
+            <p class="fs-5 mb-4">Join hundreds of members who have already begun their fitness journey at Timmy's Elite Performance Center.</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button onclick="scrollToPlans()" class="btn btn-warning btn-lg">
+                    <i class="fas fa-rocket me-2"></i>START YOUR JOURNEY
+                </button>
+                <a href="{% url 'bookings:booking_calendar' %}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-calendar me-2"></i>BOOK A TRIAL SESSION
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function scrollToPlans() {
+    document.querySelector('.row.mb-5').scrollIntoView({
+        behavior: 'smooth'
+    });
+}
+
+// Add hover effects
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

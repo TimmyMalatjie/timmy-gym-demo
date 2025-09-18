@@ -1,0 +1,581 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Membership Store - Choose Your Power Level{% endblock %}
+
+{% block extra_css %}
+<style>
+    .membership-store {
+        background: linear-gradient(135deg, #0047A3 0%, #1a5cb8 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+    }
+    
+    .plan-card {
+        border: 3px solid transparent;
+        border-radius: 20px;
+        background: white;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .plan-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+    
+    .plan-card:hover::before {
+        left: 100%;
+    }
+    
+    .plan-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 71, 163, 0.4);
+        border-color: #F96610;
+    }
+    
+    .plan-featured {
+        border-color: #F96610;
+        position: relative;
+    }
+    
+    .plan-featured::after {
+        content: 'MOST POPULAR';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #F96610;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .plan-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .warrior-icon { color: #28a745; }
+    .fighter-icon { color: #F96610; }
+    .champion-icon { color: #ffd700; }
+    
+    .price-display {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #0047A3;
+        margin: 1rem 0;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .feature-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .feature-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-included {
+        color: #28a745;
+    }
+    
+    .feature-excluded {
+        color: #dc3545;
+        opacity: 0.5;
+    }
+    
+    .power-meter {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 20px;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+    
+    .power-fill {
+        height: 100%;
+        transition: width 2s ease-in-out;
+        border-radius: 10px;
+    }
+    
+    .power-warrior { 
+        background: linear-gradient(90deg, #28a745, #20c997);
+        width: 60%; 
+    }
+    
+    .power-fighter { 
+        background: linear-gradient(90deg, #F96610, #fd7e14);
+        width: 85%; 
+    }
+    
+    .power-champion { 
+        background: linear-gradient(90deg, #ffd700, #ffed4a);
+        width: 100%; 
+    }
+    
+    .upgrade-button {
+        background: linear-gradient(45deg, #0047A3, #1a5cb8);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+        padding: 1rem 2rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .upgrade-button:hover {
+        background: linear-gradient(45deg, #F96610, #fd7e14);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(249, 102, 16, 0.4);
+    }
+    
+    .current-plan-badge {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+        padding: 1rem 2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stats-bar {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 3rem 0;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #0047A3;
+        display: block;
+    }
+    
+    .comparison-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin: 3rem 0;
+    }
+    
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 5px rgba(249, 102, 16, 0.5); }
+        50% { box-shadow: 0 0 20px rgba(249, 102, 16, 0.8), 0 0 30px rgba(249, 102, 16, 0.6); }
+    }
+    
+    .plan-featured {
+        animation: glow 3s infinite;
+    }
+    
+    .testimonial-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .guarantee-badge {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        text-align: center;
+        margin: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="membership-store">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold">MEMBERSHIP POWER-UP STORE</h1>
+        <p class="lead fs-4">Choose your membership tier and unlock your training potential!</p>
+        <div class="mt-4">
+            <span class="badge bg-warning text-dark fs-6 me-3">Build Your Empire</span>
+            <span class="badge bg-success fs-6 me-3">Achieve Your Goals</span>
+            <span class="badge bg-info fs-6">Level Up Daily</span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="text-muted">Active Warriors</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">15+</span>
+                    <span class="text-muted">Elite Trainers</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="text-muted">Gym Access</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">98%</span>
+                    <span class="text-muted">Success Rate</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Membership Plans -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="display-5 fw-bold">SELECT YOUR CHARACTER CLASS</h2>
+            <p class="lead text-muted">Each membership tier unlocks new abilities and training areas</p>
+        </div>
+        
+        {% for plan in plans %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="plan-card {% if plan.name == 'Elite Fighter' %}plan-featured{% endif %} p-4">
+                {% if 'Warrior' in plan.name %}
+                    <div class="text-center">
+                        <span class="plan-icon warrior-icon">🛡️</span>
+                        <h3 class="fw-bold text-success">{{ plan.name|upper }}</h3>
+                        <p class="text-muted">Perfect for fitness beginners</p>
+                        <div class="power-meter">
+                            <div class="power-fill power-warrior"></div>
+                        </div>
+                        <div class="price-display text-success">R{{ plan.monthly_price }}</div>
+                        <p class="small text-muted">per month</p>
+                    </div>
+                {% elif 'Fighter' in plan.name %}
+                    <div class="text-center">
+                        <span class="plan-icon fighter-icon">⚔️</span>
+                        <h3 class="fw-bold text-warning">{{ plan.name|upper }}</h3>
+                        <p class="text-muted">Most popular choice</p>
+                        <div class="power-meter">
+                            <div class="power-fill power-fighter"></div>
+                        </div>
+                        <div class="price-display text-warning">R{{ plan.monthly_price }}</div>
+                        <p class="small text-muted">per month</p>
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <span class="plan-icon champion-icon">👑</span>
+                        <h3 class="fw-bold text-warning">{{ plan.name|upper }}</h3>
+                        <p class="text-muted">Ultimate training experience</p>
+                        <div class="power-meter">
+                            <div class="power-fill power-champion"></div>
+                        </div>
+                        <div class="price-display" style="color: #ffd700;">R{{ plan.monthly_price }}</div>
+                        <p class="small text-muted">per month</p>
+                    </div>
+                {% endif %}
+                
+                <!-- Features List -->
+                <ul class="feature-list">
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        24/7 Gym Access
+                    </li>
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ plan.classes_per_month|default:"10" }} Group Classes/Month
+                    </li>
+                    {% if 'Warrior' not in plan.name %}
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ plan.pt_sessions_per_month|default:"4" }} Personal Training Sessions
+                    </li>
+                    {% else %}
+                    <li class="feature-excluded">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Personal Training Sessions
+                    </li>
+                    {% endif %}
+                    
+                    {% if 'Champion' in plan.name %}
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        MMA Training Access
+                    </li>
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Nutrition Consultation
+                    </li>
+                    <li class="feature-included">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Priority Booking
+                    </li>
+                    {% else %}
+                    <li class="feature-excluded">
+                        <i class="fas fa-times-circle me-2"></i>
+                        MMA Training Access
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Action Button -->
+                <div class="text-center mt-4">
+                    {% if user.is_authenticated and user.membership.plan.id|default:0 == plan.id %}
+                        <button class="btn current-plan-badge" disabled>
+                            <i class="fas fa-crown me-2"></i>CURRENT PLAN
+                        </button>
+                    {% elif user.is_authenticated %}
+                        <a href="{% url 'memberships:membership_purchase' plan.id %}" class="btn upgrade-button">
+                            <i class="fas fa-rocket me-2"></i>UPGRADE TO {{ plan.name|upper }}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={% url 'memberships:membership_purchase' plan.id %}" class="btn upgrade-button">
+                            <i class="fas fa-sign-in-alt me-2"></i>LOGIN TO PURCHASE
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-warning">
+                <h4>No membership plans available</h4>
+                <p>Please check back later for available membership options.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Money-Back Guarantee -->
+    <div class="guarantee-badge">
+        <h4 class="mb-2"><i class="fas fa-shield-alt me-2"></i>30-Day Money-Back Guarantee</h4>
+        <p class="mb-0">Not satisfied? Get a full refund within 30 days, no questions asked.</p>
+    </div>
+    
+    <!-- Comparison Table -->
+    <div class="comparison-table">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Features</th>
+                        <th scope="col" class="text-center">Basic Warrior</th>
+                        <th scope="col" class="text-center">Elite Fighter</th>
+                        <th scope="col" class="text-center">Champion Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>24/7 Gym Access</strong></td>
+                        <td class="text-center text-success"><i class="fas fa-check"></i></td>
+                        <td class="text-center text-success"><i class="fas fa-check"></i></td>
+                        <td class="text-center text-success"><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Group Classes</strong></td>
+                        <td class="text-center">10/month</td>
+                        <td class="text-center">Unlimited</td>
+                        <td class="text-center">Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Personal Training</strong></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center">4/month</td>
+                        <td class="text-center">8/month</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MMA Training</strong></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center text-success"><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nutrition Consultation</strong></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center text-success"><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Priority Booking</strong></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center text-danger"><i class="fas fa-times"></i></td>
+                        <td class="text-center text-success"><i class="fas fa-check"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Testimonials Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h3 class="fw-bold">What Our Warriors Say</h3>
+        </div>
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="text-center mb-3">
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-muted">"Timmy's gym transformed my life! The trainers are incredible and the facilities are world-class."</p>
+                <div class="fw-bold">- Sarah M.</div>
+                <div class="small text-muted">Elite Fighter Member</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="text-center mb-3">
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-muted">"Best investment I ever made. Lost 30kg and gained confidence. The MMA training is amazing!"</p>
+                <div class="fw-bold">- Mike T.</div>
+                <div class="small text-muted">Champion Access Member</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="text-center mb-3">
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-muted">"Started as a complete beginner with Basic Warrior. Now I'm an Elite Fighter and loving every session!"</p>
+                <div class="fw-bold">- Lisa K.</div>
+                <div class="small text-muted">Elite Fighter Member</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center fw-bold mb-4">Frequently Asked Questions</h3>
+            <div class="accordion" id="membershipFAQ">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                            Can I cancel my membership anytime?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#membershipFAQ">
+                        <div class="accordion-body">
+                            Yes, you can cancel your membership at any time with 30 days notice. We also offer a 30-day money-back guarantee for new members.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                            Can I upgrade or downgrade my plan?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#membershipFAQ">
+                        <div class="accordion-body">
+                            Absolutely! You can upgrade your plan immediately or downgrade at the end of your current billing cycle. Contact us for assistance.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                            What happens if I miss personal training sessions?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#membershipFAQ">
+                        <div class="accordion-body">
+                            Unused sessions roll over to the next month, up to a maximum of 2 sessions. We recommend booking in advance to secure your preferred times.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for animations -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate power meters on scroll
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const powerFill = entry.target.querySelector('.power-fill');
+                if (powerFill) {
+                    powerFill.style.width = powerFill.classList.contains('power-warrior') ? '60%' :
+                                           powerFill.classList.contains('power-fighter') ? '85%' : '100%';
+                }
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.power-meter').forEach(meter => {
+        observer.observe(meter.parentElement);
+    });
+    
+    // Add hover effects to plan cards
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.querySelector('.upgrade-button')?.classList.add('pulse');
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.querySelector('.upgrade-button')?.classList.remove('pulse');
+        });
+    });
+});
+</script>
+{% endblock %}

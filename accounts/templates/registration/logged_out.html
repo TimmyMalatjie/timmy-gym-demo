@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out - Timmy's Gym{% endblock %}
+
+{% block content %}
+<!-- LOGOUT CONFIRMATION SECTION -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <!-- Success Icon -->
+                        <div class="mb-4">
+                            <div class="feature-icon mx-auto" style="width: 100px; height: 100px; font-size: 3rem; background: linear-gradient(135deg, #28a745, #20c997);">
+                                ✅
+                            </div>
+                        </div>
+                        
+                        <!-- Logout Message -->
+                        <h2 class="text-primary-custom mb-3">Session Ended Successfully</h2>
+                        <p class="lead text-muted mb-4">
+                            You've been safely logged out of your Timmy's Gym account. 
+                            Thanks for training with us today!
+                        </p>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 justify-content-center flex-wrap">
+                            <a href="{% url 'login' %}" class="btn btn-primary-custom btn-lg px-4">
+                                🔑 Login Again
+                            </a>
+                            <a href="{% url 'home' %}" class="btn btn-outline-primary btn-lg px-4">
+                                🏠 Go Home
+                            </a>
+                        </div>
+                        
+                        <!-- Quick Links -->
+                        <div class="mt-4 pt-4 border-top">
+                            <h6 class="text-primary-custom mb-3">Quick Links</h6>
+                            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                                <a href="#" class="text-decoration-none">
+                                    <small>📅 Class Schedule</small>
+                                </a>
+                                <a href="#" class="text-decoration-none">
+                                    <small>💳 Membership Plans</small>
+                                </a>
+                                <a href="#" class="text-decoration-none">
+                                    <small>📞 Contact Us</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MOTIVATIONAL SECTION -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="text-primary-custom mb-4">Keep the Momentum Going! 💪</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">🎯</div>
+                            <h6>Set Daily Goals</h6>
+                            <small class="text-muted">Plan tomorrow's workout</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">📱</div>
+                            <h6>Stay Connected</h6>
+                            <small class="text-muted">Follow us on social media</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">⏰</div>
+                            <h6>Book Ahead</h6>
+                            <small class="text-muted">Schedule next week's sessions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section class="bg-primary-custom text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h4 class="mb-1">Ready to Get Back in There?</h4>
+                <p class="mb-0">Your transformation journey continues with every session!</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a href="{% url 'login' %}" class="btn btn-secondary-custom btn-lg">
+                    🚀 LOGIN & TRAIN
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

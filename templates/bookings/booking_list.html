@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings - Timmy's Gym{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="bg-primary-custom text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="mb-1">My Bookings</h2>
+                <p class="mb-0 opacity-75">Track your training sessions and progress</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'bookings:calendar' %}" class="btn btn-outline-light">
+                    <i class="fas fa-plus me-2"></i>Book New Session
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS SECTION -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-primary-custom mb-1">{{ stats.total_bookings }}</h3>
+                        <small class="text-muted">Total Sessions</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-success mb-1">{{ stats.completed_sessions }}</h3>
+                        <small class="text-muted">Completed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-warning mb-1">{{ stats.upcoming_sessions }}</h3>
+                        <small class="text-muted">Upcoming</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-danger mb-1">{{ stats.cancelled_sessions }}</h3>
+                        <small class="text-muted">Cancelled</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BOOKINGS LIST -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- FILTERS -->
+            <div class="col-lg-3">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Filter Bookings</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select" onchange="this.form.submit()">
+                                    {% for value, display in status_choices %}
+                                        <option value="{{ value }}" {% if current_filters.status == value %}selected{% endif %}>
+                                            {{ display }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Service</label>
+                                <select name="service" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Services</option>
+                                    {% for service in services %}
+                                        <option value="{{ service.id }}" {% if current_filters.service == service.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ service.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-secondary btn-sm">Clear Filters</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BOOKINGS -->
+            <div class="col-lg-9">
+                {% if bookings %}
+                    {% for booking in bookings %}
+                    <div class="card border-0 shadow mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-start">
+                                        <div class="me-3">
+                                            <div class="bg-{% if booking.status == 'confirmed' %}primary{% elif booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %} text-white rounded text-center p-2" style="width: 50px;">
+                                                <small class="fw-bold">{{ booking.date.day }}</small><br>
+                                                <small style="font-size: 0.7rem;">{{ booking.date|date:"M" }}</small>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">{{ booking.service.name }}</h5>
+                                            <p class="mb-1 text-muted">
+                                                <i class="fas fa-calendar me-1"></i>{{ booking.date|date:"l, F d, Y" }}
+                                                <span class="mx-2">•</span>
+                                                <i class="fas fa-clock me-1"></i>{{ booking.start_time|time:"g:i A" }} - {{ booking.end_time|time:"g:i A" }}
+                                            </p>
+                                            {% if booking.trainer %}
+                                            <p class="mb-1 text-muted">
+                                                <i class="fas fa-user me-1"></i>{{ booking.trainer.user.get_full_name }}
+                                            </p>
+                                            {% endif %}
+                                            <span class="badge bg-{% if booking.status == 'confirmed' %}primary{% elif booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <div class="mb-2">
+                                        <span class="fw-bold text-primary-custom">R{{ booking.service.price }}</span>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if booking.status in 'pending,confirmed' and booking.date >= today %}
+                                        <a href="{% url 'bookings:booking_reschedule' booking.id %}" class="btn btn-outline-warning" title="Reschedule">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'bookings:booking_cancel' booking.id %}" class="btn btn-outline-danger" title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- PAGINATION -->
+                    {% if is_paginated %}
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav>
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_filters.status != 'all' %}&status={{ current_filters.status }}{% endif %}{% if current_filters.service %}&service={{ current_filters.service }}{% endif %}">
+                                            Previous
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if current_filters.status != 'all' %}&status={{ current_filters.status }}{% endif %}{% if current_filters.service %}&service={{ current_filters.service }}{% endif %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_filters.status != 'all' %}&status={{ current_filters.status }}{% endif %}{% if current_filters.service %}&service={{ current_filters.service }}{% endif %}">
+                                            Next
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        <h4>No Bookings Found</h4>
+                        <p class="text-muted mb-4">
+                            {% if current_filters.status != 'all' or current_filters.service %}
+                                No bookings match your current filters. Try adjusting your search criteria.
+                            {% else %}
+                                You haven't booked any sessions yet. Start your fitness journey today!
+                            {% endif %}
+                        </p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{% url 'bookings:calendar' %}" class="btn btn-primary-custom">
+                                Book Your First Session
+                            </a>
+                            {% if current_filters.status != 'all' or current_filters.service %}
+                            <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-secondary">
+                                Clear Filters
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

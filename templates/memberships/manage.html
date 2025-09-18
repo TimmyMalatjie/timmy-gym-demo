@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Membership - Timmy's Gym{% endblock %}
+
+{% block content %}
+{% if membership %}
+<!-- MEMBERSHIP STATUS HEADER -->
+<section class="bg-{% if membership.is_active %}primary{% else %}warning{% endif %} text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="mb-1">{{ membership.plan.name }} Membership</h2>
+                <p class="mb-0 opacity-75">
+                    {% if membership.is_active %}
+                        Active until {{ membership.end_date|date:"F d, Y" }}
+                    {% else %}
+                        Status: {{ membership.get_status_display }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <span class="badge bg-{% if membership.is_active %}success{% else %}warning{% endif %} fs-6">
+                    {{ membership.get_status_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MEMBERSHIP OVERVIEW -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- USAGE STATS -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0">Usage This Month</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- GROUP CLASSES -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Group Classes</h6>
+                                {% if usage_stats.classes_unlimited %}
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Classes Attended:</span>
+                                        <span class="fw-bold">{{ usage_stats.classes_used }}</span>
+                                    </div>
+                                    <div class="progress mb-2" style="height: 8px;">
+                                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                                    </div>
+                                    <small class="text-success">Unlimited Classes Available</small>
+                                {% else %}
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Classes Used:</span>
+                                        <span class="fw-bold">{{ usage_stats.classes_used }} / {{ usage_stats.classes_included }}</span>
+                                    </div>
+                                    {% if usage_stats.classes_included > 0 %}
+                                        {% widthratio usage_stats.classes_used usage_stats.classes_included 100 as classes_percentage %}
+                                        <div class="progress mb-2" style="height: 8px;">
+                                            <div class="progress-bar bg-primary" style="width: {{ classes_percentage }}%"></div>
+                                        </div>
+                                        {% with remaining=usage_stats.classes_included|add:usage_stats.classes_used|add:"-"|add:usage_stats.classes_used %}
+                                        <small class="text-muted">{{ usage_stats.classes_included|add:"-"|add:usage_stats.classes_used }} classes remaining</small>
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            
+                            <!-- PERSONAL TRAINING -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Personal Training</h6>
+                                {% if usage_stats.pt_sessions_included > 0 %}
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Sessions Used:</span>
+                                        <span class="fw-bold">{{ usage_stats.pt_sessions_used }} / {{ usage_stats.pt_sessions_included }}</span>
+                                    </div>
+                                    {% widthratio usage_stats.pt_sessions_used usage_stats.pt_sessions_included 100 as pt_percentage %}
+                                    <div class="progress mb-2" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" style="width: {{ pt_percentage }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ usage_stats.pt_sessions_included|add:"-"|add:usage_stats.pt_sessions_used }} sessions remaining</small>
+                                {% else %}
+                                    <p class="text-muted mb-0">No PT sessions included in your plan</p>
+                                    <small class="text-muted">Upgrade to add personal training sessions</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h4 class="text-primary mb-1">{{ days_remaining|default:"--" }}</h4>
+                                <small class="text-muted">Days Remaining</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-primary mb-1">{{ membership.start_date|timesince }}</h4>
+                                <small class="text-muted">Member Since</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-warning mb-1">R{{ membership.plan.monthly_price }}</h4>
+                                <small class="text-muted">Monthly Fee</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-warning mb-1">{{ membership.next_billing_date|date:"M d"|default:"--" }}</h4>
+                                <small class="text-muted">Next Billing</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- UPGRADE OPTIONS -->
+                {% if upgrade_options %}
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0">Upgrade Your Membership</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-4">Take your fitness to the next level with enhanced plans and additional benefits.</p>
+                        <div class="row g-3">
+                            {% for plan in upgrade_options %}
+                            <div class="col-md-6">
+                                <div class="card border h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ plan.name }}</h5>
+                                        <p class="card-text">{{ plan.description|truncatewords:15 }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold text-primary">R{{ plan.monthly_price }}/month</span>
+                                            <a href="{% url 'memberships:membership_purchase' plan.id %}" class="btn btn-outline-primary btn-sm">Upgrade</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- SIDEBAR - ACTIONS & INFO -->
+            <div class="col-lg-4">
+                <!-- QUICK ACTIONS -->
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'bookings:booking_calendar' %}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-calendar-plus me-3 text-primary"></i>
+                                <div>
+                                    <h6 class="mb-1">Book Session</h6>
+                                    <small class="text-muted">Schedule training</small>
+                                </div>
+                            </a>
+                            <a href="{% url 'bookings:booking_calendar' %}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-history me-3 text-primary"></i>
+                                <div>
+                                    <h6 class="mb-1">My Bookings</h6>
+                                    <small class="text-muted">View history</small>
+                                </div>
+                            </div>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" onclick="alert('Feature coming soon!')">
+                                <i class="fas fa-receipt me-3 text-primary"></i>
+                                <div>
+                                    <h6 class="mb-1">Billing History</h6>
+                                    <small class="text-muted">Invoices & payments</small>
+                                </div>
+                            </a>
+                            <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-user-edit me-3 text-primary"></i>
+                                <div>
+                                    <h6 class="mb-1">Update Profile</h6>
+                                    <small class="text-muted">Personal info</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MEMBERSHIP DETAILS -->
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Membership Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Plan Type</h6>
+                            <p class="mb-0">{{ membership.plan.name }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Start Date</h6>
+                            <p class="mb-0">{{ membership.start_date|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">End Date</h6>
+                            <p class="mb-0">{{ membership.end_date|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Next Billing</h6>
+                            <p class="mb-0">{{ membership.next_billing_date|date:"F d, Y"|default:"Not scheduled" }}</p>
+                        </div>
+                        <div class="mb-0">
+                            <h6 class="text-muted mb-1">Monthly Fee</h6>
+                            <p class="mb-0 fw-bold text-primary">R{{ membership.plan.monthly_price }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DANGER ZONE -->
+                {% if membership.is_active %}
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0">Membership Settings</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <h6 class="text-danger">Cancel Membership</h6>
+                        <p class="small text-muted mb-3">Cancel your membership with 30 days notice</p>
+                        <button class="btn btn-outline-danger btn-sm" onclick="alert('Cancellation feature coming soon! Please contact us directly.')">
+                            Cancel Membership
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% else %}
+<!-- NO MEMBERSHIP STATE -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-user-slash fa-4x text-muted mb-3"></i>
+                </div>
+                <h2 class="mb-3">No Active Membership</h2>
+                <p class="lead text-muted mb-4">
+                    You don't currently have an active membership. Choose a plan below to unlock all the benefits of Timmy's Elite Performance Center.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'memberships:membership_plans' %}" class="btn btn-primary btn-lg">
+                        View Membership Plans
+                    </a>
+                    <a href="{% url 'bookings:booking_calendar' %}" class="btn btn-outline-primary btn-lg">
+                        Browse Services
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AVAILABLE PLANS PREVIEW -->
+        {% if available_plans %}
+        <div class="row mt-5 g-4">
+            {% for plan in available_plans %}
+            <div class="col-lg-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title">{{ plan.name }}</h5>
+                        <div class="mb-3">
+                            <span class="display-6 fw-bold text-primary">R{{ plan.monthly_price }}</span>
+                            <small class="text-muted">/month</small>
+                        </div>
+                        <p class="card-text">{{ plan.description|truncatewords:20|default:"Complete fitness solution for your goals." }}</p>
+                        <a href="{% url 'memberships:membership_purchase' plan.id %}" class="btn btn-outline-primary">
+                            Select {{ plan.name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

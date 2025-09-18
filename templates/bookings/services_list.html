@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Training Services - Timmy's Gym{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="bg-primary-custom text-white py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Training Services</h1>
+                <p class="lead mb-4">Discover our comprehensive range of training options designed to help you achieve elite performance.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEARCH & FILTER -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="card border-0 shadow">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Search Services</label>
+                        <input type="text" name="search" class="form-control" placeholder="Search by name or description..." 
+                               value="{{ current_filters.search }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Service Type</label>
+                        <select name="type" class="form-select">
+                            <option value="">All Types</option>
+                            {% for value, display in service_types %}
+                                <option value="{{ value }}" {% if current_filters.type == value %}selected{% endif %}>
+                                    {{ display }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                        <a href="{% url 'bookings:services_list' %}" class="btn btn-outline-secondary ms-2">
+                            Clear
+                        </a>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="col-md-2">
+                        <a href="{% url 'bookings:calendar' %}" class="btn btn-secondary-custom w-100">
+                            <i class="fas fa-calendar-plus me-1"></i>Book Now
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES GRID -->
+<section class="py-5">
+    <div class="container">
+        {% if services %}
+            <div class="row g-4">
+                {% for service in services %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-lg hover-card">
+                        <div class="card-header bg-{% if service.service_type == 'personal_training' %}primary{% elif service.service_type == 'mma_session' %}danger{% elif service.service_type == 'group_class' %}success{% else %}info{% endif %} text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-dark">{{ service.get_service_type_display }}</span>
+                                <span class="fw-bold">{{ service.duration_minutes }}min</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-3">{{ service.name }}</h4>
+                            <p class="card-text text-muted mb-3">{{ service.description|truncatewords:20 }}</p>
+                            
+                            <div class="mb-3">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Price</small>
+                                        <strong class="text-primary-custom">R{{ service.price }}</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Duration</small>
+                                        <strong>{{ service.duration_minutes }}min</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Max Size</small>
+                                        <strong>{{ service.max_participants }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if service.minimum_fitness_level %}
+                            <div class="mb-3">
+                                <small class="text-muted">Fitness Level:</small>
+                                <span class="badge bg-warning">{{ service.minimum_fitness_level|title }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if service.requires_membership %}
+                            <div class="mb-3">
+                                <small class="text-warning">
+                                    <i class="fas fa-id-card me-1"></i>Membership Required
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer bg-transparent p-4">
+                            <div class="d-grid gap-2">
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'bookings:book_session' %}?service_id={{ service.id }}" class="btn btn-primary-custom">
+                                        <i class="fas fa-calendar-plus me-2"></i>Book Session
+                                    </a>
+                                    <a href="{% url 'bookings:service_detail' service.id %}" class="btn btn-outline-primary btn-sm">
+                                        Learn More
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'login' %}?next={% url 'bookings:book_session' %}?service_id={{ service.id }}" class="btn btn-primary-custom">
+                                        <i class="fas fa-calendar-plus me-2"></i>Login to Book
+                                    </a>
+                                    <a href="{% url 'bookings:service_detail' service.id %}" class="btn btn-outline-primary btn-sm">
+                                        Learn More
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- PAGINATION -->
+            {% if is_paginated %}
+            <div class="d-flex justify-content-center mt-5">
+                <nav>
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_filters.type %}&type={{ current_filters.type }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}">
+                                    Previous
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if current_filters.type %}&type={{ current_filters.type }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_filters.type %}&type={{ current_filters.type }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}">
+                                    Next
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                <h4>No Services Found</h4>
+                <p class="text-muted mb-4">
+                    {% if current_filters.search or current_filters.type %}
+                        No services match your search criteria. Try adjusting your filters.
+                    {% else %}
+                        We're currently updating our service catalog. Please check back soon!
+                    {% endif %}
+                </p>
+                {% if current_filters.search or current_filters.type %}
+                <a href="{% url 'bookings:services_list' %}" class="btn btn-primary-custom">Clear Filters</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="bg-secondary-custom text-white py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h2 class="mb-3">Ready to Start Your Journey?</h2>
+                <p class="lead mb-4">Join thousands of members who have transformed their lives through our expert training programs.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'bookings:calendar' %}" class="btn btn-light btn-lg">
+                            Book Your Session
+                        </a>
+                        <a href="{% url 'memberships:plans' %}" class="btn btn-outline-light btn-lg">
+                            View Memberships
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                            Join Now
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                            Member Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
+{% endblock %}

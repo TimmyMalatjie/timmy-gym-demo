@@ -1,0 +1,205 @@
+/* ===== TIMMY'S GYM THEME PACK ===== */
+
+:root {
+    --primary-blue: #0047A3;
+    --secondary-orange: #F96610;
+    --white: #FFFFFF;
+    --dark: #0B090A;
+    --light-gray: #f8f9fa;
+}
+
+/* === CORE GAME STYLING === */
+body {
+    font-family: 'Arial', sans-serif;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* === NAVIGATION BAR (Main Menu) === */
+.navbar-dark.bg-primary {
+    background-color: var(--primary-blue) !important;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.nav-link:hover {
+    color: var(--secondary-orange) !important;
+    transition: color 0.3s ease;
+}
+
+/* === BUTTONS (Action Commands) === */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+    background-color: #003a8c;
+    border-color: #003a8c;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-orange);
+    border-color: var(--secondary-orange);
+    color: var(--white);
+}
+
+.btn-secondary:hover {
+    background-color: #e55a0e;
+    border-color: #e55a0e;
+    color: var(--white);
+}
+
+/* === HERO SECTION (Main Game Screen) === */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #003a8c 100%);
+    color: var(--white);
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-button {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* === FEATURE CARDS (Game Modules) === */
+.feature-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-orange));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    color: var(--white);
+}
+
+.feature-title {
+    color: var(--primary-blue);
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* === STATS SECTION (Player Progress) === */
+.stats-section {
+    background-color: var(--light-gray);
+    padding: 60px 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--secondary-orange);
+    display: block;
+}
+
+.stat-label {
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* === FOOTER (Game Credits) === */
+footer.bg-dark {
+    background-color: var(--dark) !important;
+}
+
+/* === RESPONSIVE DESIGN (Multi-Platform Support) === */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .cta-button {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+}
+
+/* === UTILITY CLASSES (Power-ups) === */
+.text-primary-custom {
+    color: var(--primary-blue) !important;
+}
+
+.text-secondary-custom {
+    color: var(--secondary-orange) !important;
+}
+
+.bg-primary-custom {
+    background-color: var(--primary-blue) !important;
+}
+
+.bg-secondary-custom {
+    background-color: var(--secondary-orange) !important;
+}
