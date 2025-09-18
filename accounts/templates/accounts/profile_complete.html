@@ -21,74 +21,226 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                <!-- Form-wide Error Messages -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Profile Completion Issues</h6>
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <!-- General Form Errors -->
+                {% if form.errors and not form.non_field_errors %}
+                    <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Please Check Your Information</h6>
+                        <p class="mb-0">Some fields need your attention before we can complete your profile.</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
                 <div class="card shadow-lg border-0">
                     <div class="card-header bg-primary-custom text-white text-center py-4">
-                        <h3 class="mb-0">🎯 Character Customization</h3>
+                        <h3 class="mb-0">Character Customization</h3>
                         <p class="mb-0 opacity-75">Tell us about your fitness journey</p>
                     </div>
                     <div class="card-body p-5">
-                        <form method="post">
+                        <form method="post" id="profileForm">
                             {% csrf_token %}
                             
                             <!-- Personal Information -->
                             <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">📋 Personal Information</h5>
+                                <h5 class="text-primary-custom mb-3">
+                                    <i class="fas fa-user me-2"></i>Personal Information
+                                </h5>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        {{ form.phone_number|as_crispy_field }}
+                                        <div class="mb-3">
+                                            {{ form.phone_number|as_crispy_field }}
+                                            {% if form.phone_number.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.phone_number.errors %}
+                                                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        {{ form.date_of_birth|as_crispy_field }}
+                                        <div class="mb-3">
+                                            {{ form.date_of_birth|as_crispy_field }}
+                                            {% if form.date_of_birth.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.date_of_birth.errors %}
+                                                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    Must be 16+ to join independently
+                                                </small>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                {{ form.gender|as_crispy_field }}
+                                <div class="mb-3">
+                                    {{ form.gender|as_crispy_field }}
+                                    {% if form.gender.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.gender.errors %}
+                                                <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
 
                             <!-- Emergency Contact -->
                             <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">🚨 Emergency Contact</h5>
+                                <h5 class="text-primary-custom mb-3">
+                                    <i class="fas fa-phone-alt me-2"></i>Emergency Contact
+                                </h5>
+                                <div class="alert alert-info" role="alert">
+                                    <small>
+                                        <i class="fas fa-shield-alt me-2"></i>
+                                        Required for safety - this person will be contacted in case of emergency during training
+                                    </small>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        {{ form.emergency_contact_name|as_crispy_field }}
+                                        <div class="mb-3">
+                                            {{ form.emergency_contact_name|as_crispy_field }}
+                                            {% if form.emergency_contact_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.emergency_contact_name.errors %}
+                                                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        {{ form.emergency_contact_phone|as_crispy_field }}
+                                        <div class="mb-3">
+                                            {{ form.emergency_contact_phone|as_crispy_field }}
+                                            {% if form.emergency_contact_phone.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.emergency_contact_phone.errors %}
+                                                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Fitness Profile -->
                             <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">💪 Fitness Profile</h5>
+                                <h5 class="text-primary-custom mb-3">
+                                    <i class="fas fa-dumbbell me-2"></i>Fitness Profile
+                                </h5>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        {{ form.fitness_level|as_crispy_field }}
+                                        <div class="mb-3">
+                                            {{ form.fitness_level|as_crispy_field }}
+                                            {% if form.fitness_level.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.fitness_level.errors %}
+                                                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        {{ form.primary_goal|as_crispy_field }}
+                                        <div class="mb-3">
+                                            {{ form.primary_goal|as_crispy_field }}
+                                            {% if form.primary_goal.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.primary_goal.errors %}
+                                                        <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
-                                {{ form.medical_conditions|as_crispy_field }}
+                                <div class="mb-3">
+                                    {{ form.medical_conditions|as_crispy_field }}
+                                    {% if form.medical_conditions.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.medical_conditions.errors %}
+                                                <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user-md me-1"></i>
+                                            Include any conditions, injuries, or restrictions we should know about
+                                        </small>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Preferences -->
                             <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">⚙️ Preferences</h5>
-                                {{ form.preferred_training_time|as_crispy_field }}
+                                <h5 class="text-primary-custom mb-3">
+                                    <i class="fas fa-cog me-2"></i>Preferences
+                                </h5>
+                                <div class="mb-3">
+                                    {{ form.preferred_training_time|as_crispy_field }}
+                                    {% if form.preferred_training_time.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.preferred_training_time.errors %}
+                                                <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
                                 
                                 <div class="form-check">
                                     {{ form.newsletter_subscription }}
                                     <label class="form-check-label" for="{{ form.newsletter_subscription.id_for_label }}">
                                         {{ form.newsletter_subscription.label }}
                                     </label>
+                                    {% if form.newsletter_subscription.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.newsletter_subscription.errors %}
+                                                <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
+                            </div>
+
+                            <!-- Form Validation Summary -->
+                            <div id="validation-summary" class="alert alert-danger d-none" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Please fix the following issues:
+                                </h6>
+                                <ul id="validation-list" class="mb-0"></ul>
                             </div>
 
                             <!-- Submit Button -->
                             <div class="text-center">
-                                <button type="submit" class="btn btn-secondary-custom btn-lg px-5 py-3">
-                                    🚀 COMPLETE PROFILE & ENTER GYM
+                                <button type="submit" class="btn btn-secondary-custom btn-lg px-5 py-3" id="submitBtn">
+                                    <span class="btn-text">COMPLETE PROFILE & ENTER GYM</span>
+                                    <span class="btn-spinner d-none">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Processing...
+                                    </span>
                                 </button>
+                                <div class="form-text mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-lock me-1"></i>
+                                        Your information is secure and used only for gym operations
+                                    </small>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -107,28 +259,36 @@
                 <div class="row g-4">
                     <div class="col-md-3">
                         <div class="text-center">
-                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">🏠</div>
+                            <div class="feature-icon mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-tachometer-alt fa-lg"></i>
+                            </div>
                             <h6>Access Dashboard</h6>
                             <small class="text-muted">Your personal training hub</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-center">
-                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">💳</div>
+                            <div class="feature-icon mx-auto mb-3 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-credit-card fa-lg"></i>
+                            </div>
                             <h6>Choose Membership</h6>
                             <small class="text-muted">Select your training package</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-center">
-                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">📅</div>
+                            <div class="feature-icon mx-auto mb-3 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-calendar-plus fa-lg"></i>
+                            </div>
                             <h6>Book First Session</h6>
                             <small class="text-muted">Schedule your assessment</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-center">
-                            <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">🏆</div>
+                            <div class="feature-icon mx-auto mb-3 bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-trophy fa-lg"></i>
+                            </div>
                             <h6>Start Training</h6>
                             <small class="text-muted">Begin your transformation</small>
                         </div>
@@ -138,4 +298,148 @@
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profileForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnSpinner = submitBtn.querySelector('.btn-spinner');
+    const validationSummary = document.getElementById('validation-summary');
+    const validationList = document.getElementById('validation-list');
+
+    // Form validation
+    function validateForm() {
+        const errors = [];
+        
+        // Required field validation
+        const requiredFields = [
+            { field: 'phone_number', name: 'Phone Number' },
+            { field: 'date_of_birth', name: 'Date of Birth' },
+            { field: 'emergency_contact_name', name: 'Emergency Contact Name' },
+            { field: 'emergency_contact_phone', name: 'Emergency Contact Phone' },
+            { field: 'fitness_level', name: 'Fitness Level' },
+            { field: 'primary_goal', name: 'Primary Goal' }
+        ];
+
+        requiredFields.forEach(item => {
+            const field = form.querySelector(`[name="${item.field}"]`);
+            if (field && !field.value.trim()) {
+                errors.push(`${item.name} is required`);
+                field.classList.add('is-invalid');
+            } else if (field) {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+        });
+
+        // Phone number validation
+        const phoneField = form.querySelector('[name="phone_number"]');
+        if (phoneField && phoneField.value) {
+            const phonePattern = /^[\d\s\-\+\(\)]+$/;
+            if (!phonePattern.test(phoneField.value) || phoneField.value.length < 10) {
+                errors.push('Please enter a valid phone number');
+                phoneField.classList.add('is-invalid');
+            }
+        }
+
+        // Emergency contact phone validation
+        const emergencyPhoneField = form.querySelector('[name="emergency_contact_phone"]');
+        if (emergencyPhoneField && emergencyPhoneField.value) {
+            const phonePattern = /^[\d\s\-\+\(\)]+$/;
+            if (!phonePattern.test(emergencyPhoneField.value) || emergencyPhoneField.value.length < 10) {
+                errors.push('Please enter a valid emergency contact phone number');
+                emergencyPhoneField.classList.add('is-invalid');
+            }
+        }
+
+        // Age validation
+        const dobField = form.querySelector('[name="date_of_birth"]');
+        if (dobField && dobField.value) {
+            const birthDate = new Date(dobField.value);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            if (age < 16) {
+                errors.push('You must be at least 16 years old to join');
+                dobField.classList.add('is-invalid');
+            } else if (age > 100) {
+                errors.push('Please enter a valid birth date');
+                dobField.classList.add('is-invalid');
+            }
+        }
+
+        // Display validation summary
+        if (errors.length > 0) {
+            validationList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+            validationSummary.classList.remove('d-none');
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        } else {
+            validationSummary.classList.add('d-none');
+            return true;
+        }
+    }
+
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (validateForm()) {
+            // Show loading state
+            submitBtn.disabled = true;
+            btnText.classList.add('d-none');
+            btnSpinner.classList.remove('d-none');
+            
+            // Re-enable button after 10 seconds as fallback
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                btnText.classList.remove('d-none');
+                btnSpinner.classList.add('d-none');
+            }, 10000);
+            
+            // Submit the form
+            form.submit();
+        }
+    });
+
+    // Real-time validation on input
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                validateField(this);
+            }
+        });
+    });
+
+    function validateField(field) {
+        field.classList.remove('is-invalid', 'is-valid');
+        
+        if (field.value.trim()) {
+            field.classList.add('is-valid');
+        }
+    }
+
+    // Auto-dismiss alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        if (alert.querySelector('.btn-close')) {
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+});
+</script>
 {% endblock %}
