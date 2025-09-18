@@ -17,7 +17,8 @@ def register_view(request):
     """
     if request.user.is_authenticated:
         messages.info(request, "You're already logged in!")
-        return redirect('dashboard')
+        return redirect('accounts:dashboard')
+
     
     if request.method == 'POST':
         form = CustomUserRegistrationForm(request.POST)
