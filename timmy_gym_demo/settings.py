@@ -122,6 +122,11 @@ STATICFILES_DIRS = [
 # Static files are collected into this directory
 STATIC_ROOT = BASE_DIR / 'staticfiles' 
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://timmy-gym-demo-production.up.railway.app',
+    'https://timmy-gym-demo-production.up.railway.app/', # Optional, but safer
+]
+
 # CRITICAL FIX 4: WhiteNoise storage for efficient production static serving.
 STORAGES = {
     "staticfiles": {
