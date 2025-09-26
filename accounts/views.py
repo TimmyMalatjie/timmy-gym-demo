@@ -17,7 +17,7 @@ def register_view(request):
     """
     if request.user.is_authenticated:
         messages.info(request, "You're already logged in!")
-        return redirect('dashboard')
+        return redirect('accounts:dashboard')
     
     if request.method == 'POST':
         form = CustomUserRegistrationForm(request.POST)
@@ -47,29 +47,26 @@ def register_view(request):
     
     return render(request, 'registration/register.html', {'form': form})
 
-@login_required
 def profile_complete_view(request):
     """
-    Profile completion controller - Character customization
+    Profile completion view - Character customization
     """
-    try:
-        profile = request.user.userprofile
-    except UserProfile.DoesNotExist:
-        # Create profile if it doesn't exist
-        profile = UserProfile.objects.create(user=request.user)
+    # Check if user already has a complete profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
-            messages.success(request, "Profile completed! Welcome to Timmy's Elite Performance Center!")
-            return redirect('dashboard')
+            messages.success(request, "Profile completed successfully! Welcome to the gym!")
+            # Fix: Use the namespaced URL
+            return redirect('accounts:dashboard')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = UserProfileForm(instance=profile)
     
-    return render(request, 'accounts/profile_complete.html', {'form': form})
+    return render(request, 'registration/profile_complete.html', {'form': form})
 
 @login_required
 def dashboard_view(request):

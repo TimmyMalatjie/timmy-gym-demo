@@ -3,6 +3,130 @@
 
 {% block title %}Home - Timmy's Elite Performance Center{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Features Section with Background Image */
+    .features-section {
+        background-image: url("{% static 'images/gym-background.png' %}");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        position: relative;
+        min-height: 100vh;
+    }
+    
+    /* Dark overlay for better text readability */
+    .features-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+    
+    /* Ensure content appears above overlay */
+    .features-section .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Enhanced section header for better visibility */
+    .features-section .section-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Feature cards with better transparency */
+    .features-section .feature-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: var(--border-radius);
+        padding: 2rem 1.5rem;
+        height: 100%;
+        text-align: center;
+        transition: var(--transition);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .features-section .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-blue), var(--secondary-orange));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        transform-origin: left;
+    }
+    
+    .features-section .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.98);
+    }
+    
+    .features-section .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .features-section .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+        transition: var(--transition);
+    }
+    
+    .features-section .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .features-section .feature-title {
+        color: var(--dark-text);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        transition: var(--transition);
+    }
+    
+    .features-section .feature-card:hover .feature-title {
+        color: var(--primary-blue);
+    }
+    
+    .features-section .feature-card p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .features-section {
+            background-attachment: scroll;
+            min-height: auto;
+        }
+        
+        .features-section::before {
+            background: rgba(0, 0, 0, 0.6);
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- HERO SECTION (Main Game Banner) -->
 <section class="hero-section">
@@ -17,7 +141,6 @@
                     </p>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -54,13 +177,15 @@
     </div>
 </section>
 
-<!-- FEATURES SECTION (Game Modules) -->
-<section class="py-5">
+<!-- FEATURES SECTION with Background Image -->
+<section class="features-section py-5">
     <div class="container">
         <div class="row mb-5">
             <div class="col-lg-8 mx-auto text-center">
-                <h2 class="text-primary-custom mb-3">TRAIN LIKE A <span class="text-secondary-custom">CHAMPION</span></h2>
-                <p class="lead">Multiple training disciplines under one roof. From MMA conditioning to personal transformation - we've got your journey covered.</p>
+                <div class="section-header">
+                    <h2 class="text-primary-custom mb-3">TRAIN LIKE A <span class="text-secondary-custom">CHAMPION</span></h2>
+                    <p class="lead">Multiple training disciplines under one roof. From MMA conditioning to personal transformation - we've got your journey covered.</p>
+                </div>
             </div>
         </div>
         

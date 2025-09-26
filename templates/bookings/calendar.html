@@ -5,36 +5,73 @@
 
 {% block extra_css %}
 <style>
+    /* Add background image to the booking page */
+    .booking-page {
+        background-image: url("{% static 'images/gym-background.png' %}");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        position: relative;
+    }
+    
+    /* Dark overlay for better readability */
+    .booking-page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+    
+    /* Ensure all content appears above overlay */
+    .booking-page > * {
+        position: relative;
+        z-index: 2;
+    }
+
     .booking-arena {
-        background: linear-gradient(135deg, #0047A3 0%, #1a5cb8 100%);
+        background: linear-gradient(135deg, rgba(0, 71, 163, 0.95) 0%, rgba(26, 92, 184, 0.95) 100%);
+        backdrop-filter: blur(15px);
         color: white;
         padding: 2rem 0;
         margin-bottom: 2rem;
+        border-radius: 0 0 2rem 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .service-card {
-        border: 2px solid #0047A3;
+        border: 2px solid transparent;
         border-radius: 15px;
         transition: all 0.3s ease;
-        background: white;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
         cursor: pointer;
         height: 100%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
     
     .service-card:hover, .service-card.selected {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 71, 163, 0.3);
+        box-shadow: 0 15px 40px rgba(0, 71, 163, 0.3);
         border-color: #F96610;
+        background: rgba(255, 255, 255, 0.98);
     }
     
     .service-card.selected {
-        background: linear-gradient(145deg, #fff5f0, #ffffff);
+        background: linear-gradient(145deg, rgba(255, 245, 240, 0.95), rgba(255, 255, 255, 0.95));
+        border-color: #F96610;
     }
     
     .service-icon {
         font-size: 3rem;
         color: #F96610;
         margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     .availability-grid {
@@ -46,39 +83,43 @@
     
     .time-slot {
         padding: 1rem;
-        border: 2px solid #dee2e6;
+        border: 2px solid rgba(222, 226, 230, 0.5);
         border-radius: 10px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
-        background: white;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
         position: relative;
         min-height: 80px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     
     .time-slot:hover {
         border-color: #F96610;
-        background: #fff5f0;
+        background: rgba(255, 245, 240, 0.95);
         transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(249, 102, 16, 0.2);
     }
     
     .time-slot.available {
         border-color: #28a745;
-        background: #f8fff9;
+        background: rgba(248, 255, 249, 0.95);
     }
     
     .time-slot.selected {
         border-color: #F96610;
-        background: #F96610;
+        background: linear-gradient(135deg, #F96610, #ff7a29);
         color: white;
         transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(249, 102, 16, 0.4);
     }
     
     .time-slot.booked {
-        background: #f8f9fa;
+        background: rgba(248, 249, 250, 0.8);
         color: #6c757d;
         cursor: not-allowed;
         opacity: 0.6;
@@ -97,29 +138,35 @@
     }
     
     .trainer-selector {
-        background: linear-gradient(45deg, #f8f9fa, #ffffff);
+        background: linear-gradient(45deg, rgba(248, 249, 250, 0.95), rgba(255, 255, 255, 0.95));
+        backdrop-filter: blur(15px);
         padding: 1.5rem;
         border-radius: 15px;
         margin: 2rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
     
     .trainer-card {
-        border: 2px solid #dee2e6;
+        border: 2px solid rgba(222, 226, 230, 0.5);
         border-radius: 10px;
         cursor: pointer;
         transition: all 0.3s ease;
         height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
     }
     
     .trainer-card:hover, .trainer-card.selected {
         border-color: #F96610;
         transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(249, 102, 16, 0.3);
+        box-shadow: 0 8px 25px rgba(249, 102, 16, 0.3);
+        background: rgba(255, 255, 255, 0.95);
     }
     
     .trainer-card.selected {
         border-color: #28a745;
-        background: linear-gradient(145deg, #f8fff9, #ffffff);
+        background: linear-gradient(145deg, rgba(248, 255, 249, 0.95), rgba(255, 255, 255, 0.95));
     }
     
     .progress-bar-gaming {
@@ -134,8 +181,11 @@
         align-items: center;
         margin: 2rem 0;
         padding: 1rem;
-        background: #f8f9fa;
+        background: rgba(248, 249, 250, 0.95);
+        backdrop-filter: blur(15px);
         border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     
     .progress-step {
@@ -143,28 +193,85 @@
         padding: 0.5rem;
         border-radius: 50px;
         min-width: 120px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
     
     .progress-step.active {
-        background: #F96610;
+        background: linear-gradient(135deg, #F96610, #ff7a29);
         color: white;
+        box-shadow: 0 4px 15px rgba(249, 102, 16, 0.3);
     }
     
     .progress-step.completed {
-        background: #28a745;
+        background: linear-gradient(135deg, #28a745, #20c997);
         color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
     }
     
     .spinner-container {
         text-align: center;
         padding: 2rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        grid-column: 1 / -1;
     }
     
     .booking-summary {
-        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        background: linear-gradient(145deg, rgba(248, 249, 250, 0.95), rgba(255, 255, 255, 0.95));
+        backdrop-filter: blur(15px);
         padding: 1.5rem;
         border-radius: 10px;
         border-left: 4px solid #F96610;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Enhanced card styling */
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-header.bg-primary {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #0056c4 100%) !important;
+    }
+    
+    /* Form control enhancements */
+    .form-control {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(5px);
+        border: 2px solid rgba(222, 226, 230, 0.5);
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 71, 163, 0.25);
+    }
+    
+    /* Button enhancements */
+    .btn {
+        backdrop-filter: blur(10px);
+        border-radius: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-success:hover {
+        background: linear-gradient(135deg, #218838, #1ea0bd);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
     }
     
     .fade-in {
@@ -185,166 +292,192 @@
         50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .booking-page {
+            background-attachment: scroll;
+        }
+        
+        .booking-page::before {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .booking-progress {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .progress-step {
+            min-width: 100%;
+        }
+        
+        .availability-grid {
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="booking-arena">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold">Choose Your Training Battle</h1>
-        <p class="lead">Select your service, pick your time, and level up your fitness journey!</p>
-    </div>
-</div>
-
-<div class="container">
-    <!-- Progress Indicator -->
-    <div class="booking-progress">
-        <div class="progress-step active" id="step-service">1. Choose Service</div>
-        <div class="progress-step" id="step-date">2. Select Date</div>
-        <div class="progress-step" id="step-time">3. Pick Time</div>
-        <div class="progress-step" id="step-trainer">4. Choose Trainer</div>
-        <div class="progress-step" id="step-confirm">5. Confirm</div>
+<div class="booking-page">
+    <!-- Hero Section -->
+    <div class="booking-arena">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">Choose Your Training Battle</h1>
+            <p class="lead">Select your service, pick your time, and level up your fitness journey!</p>
+        </div>
     </div>
 
-    <!-- Service Selection -->
-    <div class="row mb-5" id="service-section">
-        <div class="col-12">
-            <h2 class="text-center mb-4">Select Your Training Mode</h2>
+    <div class="container">
+        <!-- Progress Indicator -->
+        <div class="booking-progress">
+            <div class="progress-step active" id="step-service">1. Choose Service</div>
+            <div class="progress-step" id="step-date">2. Select Date</div>
+            <div class="progress-step" id="step-time">3. Pick Time</div>
+            <div class="progress-step" id="step-trainer">4. Choose Trainer</div>
+            <div class="progress-step" id="step-confirm">5. Confirm</div>
         </div>
-        
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="service-card p-4 text-center" onclick="selectService(1, 'Personal Training', 60, 299)">
-                <div class="service-icon">🥊</div>
-                <h5 class="fw-bold">Personal Training</h5>
-                <p class="text-muted">One-on-one coaching with elite trainers</p>
-                <div class="mb-3">
-                    <span class="badge bg-primary">60 mins</span>
-                    <span class="badge bg-success">R299</span>
-                </div>
-                <div class="btn btn-outline-primary">SELECT BATTLE</div>
-            </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="service-card p-4 text-center" onclick="selectService(2, 'Group Class', 45, 149)">
-                <div class="service-icon">💥</div>
-                <h5 class="fw-bold">Group Classes</h5>
-                <p class="text-muted">High-energy group training sessions</p>
-                <div class="mb-3">
-                    <span class="badge bg-primary">45 mins</span>
-                    <span class="badge bg-success">R149</span>
-                </div>
-                <div class="btn btn-outline-primary">SELECT BATTLE</div>
-            </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="service-card p-4 text-center" onclick="selectService(3, 'MMA Training', 90, 399)">
-                <div class="service-icon">🥋</div>
-                <h5 class="fw-bold">MMA Training</h5>
-                <p class="text-muted">Mixed martial arts and combat training</p>
-                <div class="mb-3">
-                    <span class="badge bg-primary">90 mins</span>
-                    <span class="badge bg-success">R399</span>
-                </div>
-                <div class="btn btn-outline-primary">SELECT BATTLE</div>
-            </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="service-card p-4 text-center" onclick="selectService(4, 'Assessment', 30, 199)">
-                <div class="service-icon">📊</div>
-                <h5 class="fw-bold">Fitness Assessment</h5>
-                <p class="text-muted">Complete fitness evaluation and planning</p>
-                <div class="mb-3">
-                    <span class="badge bg-primary">30 mins</span>
-                    <span class="badge bg-success">R199</span>
-                </div>
-                <div class="btn btn-outline-primary">SELECT BATTLE</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Calendar Section -->
-    <div class="row fade-in" id="calendar-section" style="display: none;">
-        <div class="col-12">
-            <h3 class="text-center mb-4">Choose Your Battle Date</h3>
-            
-            <!-- Date Picker -->
-            <div class="text-center mb-4">
-                <input type="date" id="battle-date" class="form-control d-inline-block w-auto form-control-lg" 
-                       onchange="loadAvailability()">
+
+        <!-- Service Selection -->
+        <div class="row mb-5" id="service-section">
+            <div class="col-12">
+                <h2 class="text-center mb-4 text-white fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Select Your Training Mode</h2>
             </div>
             
-            <!-- Available Time Slots -->
-            <div id="availability-container">
-                <div class="availability-grid" id="time-slots">
-                    <!-- Time slots loaded via JavaScript -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="service-card p-4 text-center" onclick="selectService(1, 'Personal Training', 60, 299)">
+                    <div class="service-icon">🥊</div>
+                    <h5 class="fw-bold">Personal Training</h5>
+                    <p class="text-muted">One-on-one coaching with elite trainers</p>
+                    <div class="mb-3">
+                        <span class="badge bg-primary">60 mins</span>
+                        <span class="badge bg-success">R299</span>
+                    </div>
+                    <div class="btn btn-outline-primary">SELECT BATTLE</div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="service-card p-4 text-center" onclick="selectService(2, 'Group Class', 45, 149)">
+                    <div class="service-icon">💥</div>
+                    <h5 class="fw-bold">Group Classes</h5>
+                    <p class="text-muted">High-energy group training sessions</p>
+                    <div class="mb-3">
+                        <span class="badge bg-primary">45 mins</span>
+                        <span class="badge bg-success">R149</span>
+                    </div>
+                    <div class="btn btn-outline-primary">SELECT BATTLE</div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="service-card p-4 text-center" onclick="selectService(3, 'MMA Training', 90, 399)">
+                    <div class="service-icon">🥋</div>
+                    <h5 class="fw-bold">MMA Training</h5>
+                    <p class="text-muted">Mixed martial arts and combat training</p>
+                    <div class="mb-3">
+                        <span class="badge bg-primary">90 mins</span>
+                        <span class="badge bg-success">R399</span>
+                    </div>
+                    <div class="btn btn-outline-primary">SELECT BATTLE</div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="service-card p-4 text-center" onclick="selectService(4, 'Assessment', 30, 199)">
+                    <div class="service-icon">📊</div>
+                    <h5 class="fw-bold">Fitness Assessment</h5>
+                    <p class="text-muted">Complete fitness evaluation and planning</p>
+                    <div class="mb-3">
+                        <span class="badge bg-primary">30 mins</span>
+                        <span class="badge bg-success">R199</span>
+                    </div>
+                    <div class="btn btn-outline-primary">SELECT BATTLE</div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Trainer Selection -->
-    <div class="row fade-in" id="trainer-section" style="display: none;">
-        <div class="col-12">
-            <div class="trainer-selector">
-                <h4 class="text-center mb-4">Choose Your Training Master</h4>
-                <div class="row" id="trainer-options">
-                    <!-- Trainers loaded via JavaScript -->
+        
+        <!-- Calendar Section -->
+        <div class="row fade-in" id="calendar-section" style="display: none;">
+            <div class="col-12">
+                <h3 class="text-center mb-4 text-white fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Choose Your Battle Date</h3>
+                
+                <!-- Date Picker -->
+                <div class="text-center mb-4">
+                    <input type="date" id="battle-date" class="form-control d-inline-block w-auto form-control-lg" 
+                           onchange="loadAvailability()">
+                </div>
+                
+                <!-- Available Time Slots -->
+                <div id="availability-container">
+                    <div class="availability-grid" id="time-slots">
+                        <!-- Time slots loaded via JavaScript -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Booking Confirmation -->
-    <div class="row fade-in" id="booking-form" style="display: none;">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4>Confirm Your Battle Booking</h4>
+        
+        <!-- Trainer Selection -->
+        <div class="row fade-in" id="trainer-section" style="display: none;">
+            <div class="col-12">
+                <div class="trainer-selector">
+                    <h4 class="text-center mb-4">Choose Your Training Master</h4>
+                    <div class="row" id="trainer-options">
+                        <!-- Trainers loaded via JavaScript -->
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{% url 'bookings:booking_create' %}">
-                        {% csrf_token %}
-                        
-                        <!-- Hidden fields populated by JavaScript -->
-                        <input type="hidden" id="selected-service" name="service" value="">
-                        <input type="hidden" id="selected-date" name="date" value="">
-                        <input type="hidden" id="selected-time" name="time" value="">
-                        <input type="hidden" id="selected-trainer" name="trainer" value="">
-                        
-                        <!-- Booking Summary -->
-                        <div class="booking-summary mb-4">
-                            <h5>Battle Summary:</h5>
-                            <ul class="list-unstyled">
-                                <li><strong>Service:</strong> <span id="summary-service">-</span></li>
-                                <li><strong>Date:</strong> <span id="summary-date">-</span></li>
-                                <li><strong>Time:</strong> <span id="summary-time">-</span></li>
-                                <li><strong>Trainer:</strong> <span id="summary-trainer">-</span></li>
-                                <li><strong>Duration:</strong> <span id="summary-duration">-</span> minutes</li>
-                                <li><strong>Price:</strong> R<span id="summary-price">0</span></li>
-                            </ul>
-                        </div>
-                        
-                        <!-- Additional Notes -->
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Battle Notes (Optional):</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3" 
-                                    placeholder="Any special requests or goals for this session..."></textarea>
-                        </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                            <button type="button" class="btn btn-secondary" onclick="resetBooking()">
-                                Start Over
-                            </button>
-                            <button type="submit" class="btn btn-success btn-lg pulse">
-                                CONFIRM BATTLE BOOKING
-                            </button>
-                        </div>
-                    </form>
+            </div>
+        </div>
+        
+        <!-- Booking Confirmation -->
+        <div class="row fade-in" id="booking-form" style="display: none;">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h4>Confirm Your Battle Booking</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{% url 'bookings:booking_create' %}">
+                            {% csrf_token %}
+                            
+                            <!-- Hidden fields populated by JavaScript -->
+                            <input type="hidden" id="selected-service" name="service" value="">
+                            <input type="hidden" id="selected-date" name="date" value="">
+                            <input type="hidden" id="selected-time" name="time" value="">
+                            <input type="hidden" id="selected-trainer" name="trainer" value="">
+                            
+                            <!-- Booking Summary -->
+                            <div class="booking-summary mb-4">
+                                <h5>Battle Summary:</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Service:</strong> <span id="summary-service">-</span></li>
+                                    <li><strong>Date:</strong> <span id="summary-date">-</span></li>
+                                    <li><strong>Time:</strong> <span id="summary-time">-</span></li>
+                                    <li><strong>Trainer:</strong> <span id="summary-trainer">-</span></li>
+                                    <li><strong>Duration:</strong> <span id="summary-duration">-</span> minutes</li>
+                                    <li><strong>Price:</strong> R<span id="summary-price">0</span></li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Additional Notes -->
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Battle Notes (Optional):</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                        placeholder="Any special requests or goals for this session..."></textarea>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <button type="button" class="btn btn-secondary" onclick="resetBooking()">
+                                    Start Over
+                                </button>
+                                <button type="submit" class="btn btn-success btn-lg pulse">
+                                    CONFIRM BATTLE BOOKING
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

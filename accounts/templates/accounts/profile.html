@@ -1,130 +1,401 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %}My Profile - Timmy's Gym{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Add background image to the profile page */
+    .profile-page {
+        background-image: url("{% static 'images/Recovery_room.png' %}");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        position: relative;
+    }
+    
+    /* Dark overlay for better readability */
+    .profile-page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+    
+    /* Ensure all content appears above overlay */
+    .profile-page > * {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Enhanced profile header */
+    .profile-header {
+        background: linear-gradient(135deg, rgba(0, 71, 163, 0.95) 0%, rgba(26, 92, 184, 0.95) 100%);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Enhanced profile card */
+    .profile-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.98);
+    }
+    
+    /* Enhanced card header */
+    .card-header.bg-secondary-custom {
+        background: linear-gradient(135deg, var(--secondary-orange) 0%, #ff7a29 100%) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Form section headers */
+    .form-section-header {
+        color: var(--primary-blue);
+        font-weight: 700;
+        border-bottom: 2px solid rgba(0, 71, 163, 0.1);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary-blue), var(--secondary-orange));
+        border-radius: 1px;
+    }
+    
+    /* Enhanced form controls */
+    .form-control {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(5px);
+        border: 2px solid rgba(222, 226, 230, 0.5);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 71, 163, 0.25);
+        transform: translateY(-1px);
+    }
+    
+    .form-control[readonly] {
+        background: rgba(248, 249, 250, 0.9);
+        backdrop-filter: blur(5px);
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    /* Enhanced form labels */
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Enhanced form select */
+    .form-select {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(5px);
+        border: 2px solid rgba(222, 226, 230, 0.5);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-select:focus {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 71, 163, 0.25);
+    }
+    
+    /* Enhanced textarea */
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    /* Enhanced checkbox */
+    .form-check {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .form-check:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-1px);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 71, 163, 0.25);
+    }
+    
+    .form-check-label {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    /* Enhanced alerts */
+    .alert {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .alert-success {
+        background: rgba(212, 237, 218, 0.95);
+        border-color: rgba(40, 167, 69, 0.2);
+    }
+    
+    .alert-danger {
+        background: rgba(248, 215, 218, 0.95);
+        border-color: rgba(220, 53, 69, 0.2);
+    }
+    
+    /* Enhanced submit button */
+    .btn-secondary-custom {
+        background: linear-gradient(135deg, var(--secondary-orange) 0%, #ff7a29 100%);
+        border: none;
+        box-shadow: 0 6px 20px rgba(249, 102, 16, 0.3);
+        border-radius: 0.75rem;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary-custom:hover {
+        background: linear-gradient(135deg, #e55a0e 0%, #f96610 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(249, 102, 16, 0.4);
+    }
+    
+    /* Enhanced back button */
+    .btn-outline-light {
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Form sections spacing */
+    .form-section {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+    
+    .form-section:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* Small text enhancements */
+    .text-muted {
+        color: #6c757d !important;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    /* Row spacing */
+    .row {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+    
+    .row > [class^="col-"] {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .profile-page {
+            background-attachment: scroll;
+        }
+        
+        .profile-page::before {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .profile-card {
+            margin: 1rem;
+            border-radius: 1rem;
+        }
+        
+        .btn-secondary-custom {
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+        }
+        
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- PROFILE HEADER -->
-<section class="bg-primary-custom text-white py-4">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h2 class="mb-1">My Profile</h2>
-                <p class="mb-0 opacity-75">Manage your account and preferences</p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-light">
-                    ← Back to Dashboard
-                </a>
+<div class="profile-page">
+    <!-- PROFILE HEADER -->
+    <section class="profile-header text-white py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-1">My Profile</h2>
+                    <p class="mb-0 opacity-75">Manage your account and preferences</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-light">
+                        ← Back to Dashboard
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- PROFILE FORM -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="card shadow border-0">
-                    <div class="card-header bg-secondary-custom text-white">
-                        <h4 class="mb-0">⚙️ Profile Settings</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <!-- Display Messages -->
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+    <!-- PROFILE FORM -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card profile-card shadow border-0">
+                        <div class="card-header bg-secondary-custom text-white">
+                            <h4 class="mb-0">⚙️ Profile Settings</h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Display Messages -->
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
 
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            
-                            <!-- Basic Info -->
-                            <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">Basic Information</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Username</label>
-                                        <input type="text" class="form-control" value="{{ user.username }}" readonly>
-                                        <small class="text-muted">Username cannot be changed</small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" value="{{ user.email }}" readonly>
-                                        <small class="text-muted">Contact admin to change email</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Profile Fields -->
-                            <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">Personal Details</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {{ form.phone_number|as_crispy_field }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ form.date_of_birth|as_crispy_field }}
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <!-- Basic Info -->
+                                <div class="form-section">
+                                    <h5 class="form-section-header">Basic Information</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                                            <small class="text-muted">Username cannot be changed</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                            <small class="text-muted">Contact admin to change email</small>
+                                        </div>
                                     </div>
                                 </div>
-                                {{ form.gender|as_crispy_field }}
-                            </div>
 
-                            <!-- Emergency Contact -->
-                            <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">Emergency Contact</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {{ form.emergency_contact_name|as_crispy_field }}
+                                <!-- Profile Fields -->
+                                <div class="form-section">
+                                    <h5 class="form-section-header">Personal Details</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form.phone_number|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form.date_of_birth|as_crispy_field }}
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        {{ form.emergency_contact_phone|as_crispy_field }}
+                                    {{ form.gender|as_crispy_field }}
+                                </div>
+
+                                <!-- Emergency Contact -->
+                                <div class="form-section">
+                                    <h5 class="form-section-header">Emergency Contact</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form.emergency_contact_name|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form.emergency_contact_phone|as_crispy_field }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Fitness Profile -->
-                            <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">Fitness Profile</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {{ form.fitness_level|as_crispy_field }}
+                                <!-- Fitness Profile -->
+                                <div class="form-section">
+                                    <h5 class="form-section-header">Fitness Profile</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form.fitness_level|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form.primary_goal|as_crispy_field }}
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        {{ form.primary_goal|as_crispy_field }}
-                                    </div>
+                                    {{ form.medical_conditions|as_crispy_field }}
+                                    {{ form.preferred_training_time|as_crispy_field }}
                                 </div>
-                                {{ form.medical_conditions|as_crispy_field }}
-                                {{ form.preferred_training_time|as_crispy_field }}
-                            </div>
 
-                            <!-- Preferences -->
-                            <div class="mb-4">
-                                <h5 class="text-primary-custom mb-3">Preferences</h5>
-                                <div class="form-check">
-                                    {{ form.newsletter_subscription }}
-                                    <label class="form-check-label" for="{{ form.newsletter_subscription.id_for_label }}">
-                                        {{ form.newsletter_subscription.label }}
-                                    </label>
+                                <!-- Submit Button -->
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-secondary-custom btn-lg">
+                                        💾 UPDATE PROFILE
+                                    </button>
                                 </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-secondary-custom btn-lg px-5">
-                                    💾 UPDATE PROFILE
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+</div>
 {% endblock %}
