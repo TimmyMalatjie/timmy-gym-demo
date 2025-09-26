@@ -3,8 +3,92 @@
 
 {% block title %}Complete Your Profile - Timmy's Gym{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Custom styles matching the athletic/modern theme, assuming primary-custom and secondary-custom colors are defined in base.html or a shared CSS */
+    .hero-section {
+        background: linear-gradient(90deg, var(--primary-blue), #0056c4);
+        padding: 6rem 0 3rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        border-bottom: 5px solid var(--secondary-orange);
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+        opacity: 0.9;
+    }
+
+    .card {
+        border-radius: 1.5rem; /* Smoother, modern corners */
+        overflow: hidden;
+    }
+    
+    .card-header.bg-primary-custom {
+        /* Ensure consistency with custom primary color */
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #0056c4 100%) !important;
+    }
+
+    .card-body h5 {
+        border-left: 4px solid var(--secondary-orange);
+        padding-left: 1rem;
+    }
+
+    .btn-secondary-custom {
+        /* Ensure consistency with custom secondary color */
+        background: linear-gradient(90deg, var(--secondary-orange), #ff7a29) !important;
+        border: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .btn-secondary-custom:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 122, 41, 0.4);
+    }
+    
+    /* Next Steps Section Styling */
+    .feature-icon {
+        background: rgba(0, 71, 163, 0.1); /* Light blue background for icons */
+        color: var(--primary-blue);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Ensure crispy-forms inputs look clean */
+    .form-control {
+        border-radius: 0.5rem;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 4rem 0 2rem;
+        }
+        .hero-title {
+            font-size: 2.2rem;
+        }
+        .card-body {
+            padding: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- PROFILE COMPLETION HERO -->
 <section class="hero-section">
     <div class="container">
         <div class="row justify-content-center">
@@ -16,7 +100,6 @@
     </div>
 </section>
 
-<!-- PROFILE FORM SECTION -->
 <section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
@@ -30,7 +113,6 @@
                         <form method="post">
                             {% csrf_token %}
                             
-                            <!-- Personal Information -->
                             <div class="mb-4">
                                 <h5 class="text-primary-custom mb-3">📋 Personal Information</h5>
                                 <div class="row">
@@ -44,7 +126,6 @@
                                 {{ form.gender|as_crispy_field }}
                             </div>
 
-                            <!-- Emergency Contact -->
                             <div class="mb-4">
                                 <h5 class="text-primary-custom mb-3">🚨 Emergency Contact</h5>
                                 <div class="row">
@@ -57,7 +138,6 @@
                                 </div>
                             </div>
 
-                            <!-- Fitness Profile -->
                             <div class="mb-4">
                                 <h5 class="text-primary-custom mb-3">💪 Fitness Profile</h5>
                                 <div class="row">
@@ -71,20 +151,11 @@
                                 {{ form.medical_conditions|as_crispy_field }}
                             </div>
 
-                            <!-- Preferences -->
-                            <div class="mb-4">
+                            <div class="mb-5">
                                 <h5 class="text-primary-custom mb-3">⚙️ Preferences</h5>
                                 {{ form.preferred_training_time|as_crispy_field }}
-                                
-                                <div class="form-check">
-                                    {{ form.newsletter_subscription }}
-                                    <label class="form-check-label" for="{{ form.newsletter_subscription.id_for_label }}">
-                                        {{ form.newsletter_subscription.label }}
-                                    </label>
-                                </div>
                             </div>
-
-                            <!-- Submit Button -->
+                                
                             <div class="text-center">
                                 <button type="submit" class="btn btn-secondary-custom btn-lg px-5 py-3">
                                     🚀 COMPLETE PROFILE & ENTER GYM
@@ -98,38 +169,37 @@
     </div>
 </section>
 
-<!-- NEXT STEPS PREVIEW -->
 <section class="bg-light py-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-10 mx-auto text-center">
-                <h3 class="text-primary-custom mb-4">What Happens Next?</h3>
+                <h3 class="text-primary-custom mb-5">What Happens Next?</h3>
                 <div class="row g-4">
                     <div class="col-md-3">
                         <div class="text-center">
                             <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">🏠</div>
-                            <h6>Access Dashboard</h6>
+                            <h6 class="fw-bold">Access Dashboard</h6>
                             <small class="text-muted">Your personal training hub</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-center">
                             <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">💳</div>
-                            <h6>Choose Membership</h6>
+                            <h6 class="fw-bold">Choose Membership</h6>
                             <small class="text-muted">Select your training package</small>
                         </div> 
                     </div>
                     <div class="col-md-3">
                         <div class="text-center">
                             <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">📅</div>
-                            <h6>Book First Session</h6>
+                            <h6 class="fw-bold">Book First Session</h6>
                             <small class="text-muted">Schedule your assessment</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-center">
                             <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px;">🏆</div>
-                            <h6>Start Training</h6>
+                            <h6 class="fw-bold">Start Training</h6>
                             <small class="text-muted">Begin your transformation</small>
                         </div>
                     </div>
