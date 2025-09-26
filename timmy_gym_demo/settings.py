@@ -28,8 +28,7 @@ SECRET_KEY = 'django-insecure-yqr=^ombi!^#^8#b9u%ssjsb-28f&h!2o3yaty1@b2x_fqkn1a
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'timmy-gym-demo-production.up.railway.app']
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
