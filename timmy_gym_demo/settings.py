@@ -23,11 +23,10 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-yqr=^ombi!^#^8#b9u%ss
 # DEBUG is loaded from environment and cast to a boolean.
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# ALLOWED_HOSTS is loaded from environment as a comma-separated string, then split.
-# The live domain (timmy-gym-demo-production.up.railway.app) MUST be in the ALLOWED_HOSTS
-# environment variable on Railway.
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS', 
+    default='localhost,127.0.0.1,timmy-gym-demo-production.up.railway.app'
+).split(',')
 
 # Application definition
 INSTALLED_APPS = [
