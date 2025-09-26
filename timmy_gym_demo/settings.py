@@ -5,30 +5,31 @@ Django settings for timmy_gym_demo project.
 from pathlib import Path
 import os
 from decouple import config # Used to read .env/environment variables
-import dj_database_url # Used to parse DATABASE_URL (recommended for production)
+import dj_database_url # Used to parse DATABASE_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ==============================================================================
-# 1. CORE ENVIRONMENT CONFIGURATION (Must read from environment/decouple only)
+# 1. CORE ENVIRONMENT CONFIGURATION
 # ==============================================================================
 
-# **CRITICAL FIX 1: Use environment variables, not hardcoded defaults.**
-# Ensure SECRET_KEY is loaded from environment; fallback to hardcoded value ONLY for local dev.
+# CRITICAL FIX 1: Removed duplicate, hardcoded SECRET_KEY, DEBUG, and ALLOWED_HOSTS definitions.
+# Load values from environment/decouple.
+
+# SECRET_KEY is loaded from environment; fallback is the insecure key (for local dev ONLY).
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-yqr=^ombi!^#^8#b9u%ssjsb-28f&h!2o3yaty1@b2x_fqkn1a')
 
-# DEBUG is loaded from environment and cast to a boolean. Default should be True for local dev.
+# DEBUG is loaded from environment and cast to a boolean.
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # ALLOWED_HOSTS is loaded from environment as a comma-separated string, then split.
-# Fallback to a single host for local development.
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+# The live domain (timmy-gym-demo-production.up.railway.app) MUST be in the ALLOWED_HOSTS
+# environment variable on Railway.
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
-# ==============================================================================
-# 2. APPLICATION DEFINITION
-# ==============================================================================
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,9 +41,9 @@ INSTALLED_APPS = [
     # Third party packages
     'crispy_forms',
     'crispy_bootstrap5',
-    'whitenoise.runserver_nostatic', # For development/WhiteNoise
     
-    # Cloud/Storage
+    # WhiteNoise is added to INSTALLED_APPS for management command override, but the middleware is key.
+    'whitenoise.runserver_nostatic',
     'storages',
     
     # Local apps
@@ -54,8 +55,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # **CRITICAL FIX 2: Add WhiteNoise middleware for serving static files in production.**
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # CRITICAL FIX 2: WhiteNoise middleware placement for serving static files in production.
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,7 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'debug': DEBUG,
+            'debug': DEBUG, # Uses the environment-controlled DEBUG variable
         },
     },
 ]
@@ -89,13 +90,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'timmy_gym_demo.wsgi.application'
 
 # ==============================================================================
-# 3. DATABASE
+# 2. DATABASE CONFIGURATION
 # ==============================================================================
 
-# **CRITICAL FIX 3: Use dj_database_url for robust production database handling.**
+# CRITICAL FIX 3: Use dj_database_url to parse the production DATABASE_URL.
 DATABASES = {
     'default': config(
         'DATABASE_URL',
+        # Fallback to local SQLite for development
         default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
         cast=dj_database_url.parse
     )
@@ -103,8 +105,14 @@ DATABASES = {
 
 # ... (Password validation settings skipped for brevity)
 
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'Africa/Johannesburg' 
+USE_I18N = True
+USE_TZ = True
+
 # ==============================================================================
-# 4. STATIC AND MEDIA FILES (Production-Ready Configuration)
+# 3. STATIC AND MEDIA FILES (Production-Ready)
 # ==============================================================================
 
 # Static files (CSS, JavaScript, Images)
@@ -115,27 +123,26 @@ STATICFILES_DIRS = [
 # Static files are collected into this directory
 STATIC_ROOT = BASE_DIR / 'staticfiles' 
 
-# **CRITICAL FIX 4: WhiteNoise for static files in production.**
-# This tells Django to use the WhiteNoise storage backend for optimized serving.
+# CRITICAL FIX 4: WhiteNoise storage for efficient production static serving.
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
-    # Set default storage to S3 for user media (see below)
+    # Default storage set to FileSystemStorage (local) initially.
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
 }
 
 # Media files (User Uploads) - S3 Configuration
-# Use S3 for user-uploaded media ONLY when DEBUG is False (i.e., production)
+# User S3 for media storage ONLY when DEBUG is False (i.e., production)
 if not DEBUG:
-    # Read S3 credentials from environment variables
-    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default=None)
-    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default=None)
+    # Read S3 credentials from environment variables (mandatory for deployment)
     AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default=None)
     
     if AWS_STORAGE_BUCKET_NAME:
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default=None)
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default=None)
         AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
         AWS_QUERYSTRING_AUTH = config('AWS_QUERYSTRING_AUTH', default=False, cast=bool)
         
@@ -152,38 +159,23 @@ else:
     MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# ... (I18n, Auth, Crispy settings skipped for brevity as they are fine)
+# Bootstrap 5 Configuration
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# ==============================================================================
-# 5. FINAL CHECKS
-# ==============================================================================
+# Authentication redirects
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/accounts/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
-# Define a secure redirect scheme when DEBUG is False
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# FINAL PRODUCTION SECURITY CHECKS
 if not DEBUG:
     SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    # Necessary for reverse proxies like Railway
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     
-# Django's default log configuration is sufficient unless you need complex setup
-# The DEBUG log setup is only included if DEBUG is True (local development).
-if DEBUG:
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'loggers': {
-            'django.template': {
-                'handlers': ['console'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-        },
-    }
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
