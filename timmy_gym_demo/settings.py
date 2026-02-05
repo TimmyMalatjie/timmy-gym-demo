@@ -101,10 +101,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'timmy_gym_demo.wsgi.application'
 
 # Database
+# Vercel serverless filesystem is read-only except /tmp
+VERCEL_ENV = os.getenv('VERCEL') or os.getenv('VERCEL_ENV')
+SQLITE_PATH = BASE_DIR / 'db.sqlite3'
+if VERCEL_ENV:
+    SQLITE_PATH = Path('/tmp/db.sqlite3')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': SQLITE_PATH,
     }
 }
 
