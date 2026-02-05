@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db.models import Q
+from django.db import OperationalError, ProgrammingError
 from django.http import JsonResponse
 
 from .models import MembershipPlan, Membership
@@ -16,12 +17,15 @@ def membership_plans(request):
     Public membership plans display - like character class selection
     Available to all visitors
     """
-    plans = MembershipPlan.objects.filter(is_active=True).order_by('sort_order', 'monthly_price')
-    
-    # Convert QuerySet to list and add popular plan indicator
-    plans_list = list(plans)
-    if len(plans_list) >= 3:
-        plans_list[1].is_popular = True
+    plans_list = []
+    try:
+        plans = MembershipPlan.objects.filter(is_active=True).order_by('sort_order', 'monthly_price')
+        # Convert QuerySet to list and add popular plan indicator
+        plans_list = list(plans)
+        if len(plans_list) >= 3:
+            plans_list[1].is_popular = True
+    except (OperationalError, ProgrammingError):
+        plans_list = []
     
     context = {
         'plans': plans_list,  # Use the modified list instead of QuerySet
@@ -36,6 +40,8 @@ def membership_plans(request):
             context['current_membership'] = membership
         except Membership.DoesNotExist:
             pass
+        except (OperationalError, ProgrammingError):
+            pass
     
     return render(request, 'memberships/plans.html', context)
 @login_required
@@ -44,7 +50,11 @@ def membership_purchase(request, plan_id):
     Membership purchase flow - like buying a game upgrade
     Step 1: Plan selection and user info confirmation
     """
-    plan = get_object_or_404(MembershipPlan, id=plan_id, is_active=True)
+    try:
+        plan = get_object_or_404(MembershipPlan, id=plan_id, is_active=True)
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
+        return redirect('memberships:plans')
     
     # Check if user already has active membership
     try:
@@ -54,6 +64,9 @@ def membership_purchase(request, plan_id):
             return redirect('memberships:membership_manage')
     except Membership.DoesNotExist:
         pass
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
+        return redirect('memberships:plans')
     
     if request.method == 'POST':
         form = MembershipPurchaseForm(request.POST, user=request.user, plan=plan)
@@ -88,7 +101,11 @@ def membership_checkout(request):
         messages.error(request, 'Invalid purchase session. Please select a plan again.')
         return redirect('memberships:plans')
     
-    plan = get_object_or_404(MembershipPlan, id=purchase_data['plan_id'])
+    try:
+        plan = get_object_or_404(MembershipPlan, id=purchase_data['plan_id'])
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
+        return redirect('memberships:plans')
     
     if request.method == 'POST':
         billing_form = BillingInfoForm(request.POST)
@@ -139,6 +156,9 @@ def membership_success(request):
     except Membership.DoesNotExist:
         messages.error(request, 'No membership found.')
         return redirect('memberships:plans')
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
+        return redirect('memberships:plans')
     
     context = {
         'membership': membership,
@@ -158,6 +178,8 @@ class MembershipManageView(DetailView):
         try:
             return Membership.objects.get(user=self.request.user)
         except Membership.DoesNotExist:
+            return None
+        except (OperationalError, ProgrammingError):
             return None
     
     def get_context_data(self, **kwargs):
@@ -183,12 +205,18 @@ class MembershipManageView(DetailView):
                 context['days_remaining'] = max(0, days_remaining)
             
             # Available upgrade options
-            context['upgrade_options'] = MembershipPlan.objects.filter(
-                is_active=True,
-                monthly_price__gt=membership.plan.monthly_price
-            ).order_by('monthly_price')
+            try:
+                context['upgrade_options'] = MembershipPlan.objects.filter(
+                    is_active=True,
+                    monthly_price__gt=membership.plan.monthly_price
+                ).order_by('monthly_price')
+            except (OperationalError, ProgrammingError):
+                context['upgrade_options'] = []
         
-        context['available_plans'] = MembershipPlan.objects.filter(is_active=True)
+        try:
+            context['available_plans'] = MembershipPlan.objects.filter(is_active=True)
+        except (OperationalError, ProgrammingError):
+            context['available_plans'] = []
         return context
 
 @login_required
@@ -200,6 +228,9 @@ def membership_cancel(request):
         membership = Membership.objects.get(user=request.user)
     except Membership.DoesNotExist:
         messages.error(request, 'No active membership found.')
+        return redirect('memberships:plans')
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
         return redirect('memberships:plans')
     
     if not membership.is_active:
@@ -229,12 +260,19 @@ def membership_upgrade(request, plan_id):
     """
     Upgrade existing membership - character class upgrade
     """
-    new_plan = get_object_or_404(MembershipPlan, id=plan_id, is_active=True)
+    try:
+        new_plan = get_object_or_404(MembershipPlan, id=plan_id, is_active=True)
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
+        return redirect('memberships:plans')
     
     try:
         current_membership = Membership.objects.get(user=request.user)
     except Membership.DoesNotExist:
         messages.error(request, 'No current membership found.')
+        return redirect('memberships:plans')
+    except (OperationalError, ProgrammingError):
+        messages.error(request, 'Membership data is temporarily unavailable. Please try again shortly.')
         return redirect('memberships:plans')
     
     # Check if this is actually an upgrade
