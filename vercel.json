@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
+  "buildCommand": "python -m pip install -r requirements.txt --break-system-packages && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "timmy_gym_demo.settings",
