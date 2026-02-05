@@ -23,12 +23,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-yqr=^ombi!^#^8#b9u%ssjsb-2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.railway.app', 'timmy-gym-demo-production.up.railway.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.railway.app', '*.vercel.app', 'timmy-gym-demo-production.up.railway.app']
 
-# CSRF trusted origins for Railway
+# CSRF trusted origins for Railway and Vercel
 CSRF_TRUSTED_ORIGINS = [
     'https://timmy-gym-demo-production.up.railway.app',
-    'http://timmy-gym-demo-production.up.railway.app'
+    'http://timmy-gym-demo-production.up.railway.app',
+    'https://*.vercel.app'
 ]
 
 # For Railway's HTTPS redirect
@@ -125,6 +126,9 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Whitenoise for serving static files in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
