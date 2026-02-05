@@ -23,7 +23,17 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-yqr=^ombi!^#^8#b9u%ssjsb-2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.railway.app', '*.vercel.app', 'timmy-gym-demo-production.up.railway.app']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.railway.app',
+    '.vercel.app',
+    'timmy-gym-demo-production.up.railway.app',
+]
+
+VERCEL_URL = os.getenv('VERCEL_URL')
+if VERCEL_URL:
+    ALLOWED_HOSTS.append(VERCEL_URL)
 
 # CSRF trusted origins for Railway and Vercel
 CSRF_TRUSTED_ORIGINS = [

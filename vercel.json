@@ -14,14 +14,14 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/$1",
+      "dest": "/$1",
       "headers": {
         "Cache-Control": "public, max-age=3600, immutable"
       }
     },
     {
       "src": "/favicon.ico",
-      "dest": "/static/favicon.svg"
+      "dest": "/favicon.svg"
     },
     {
       "src": "/(.*)",
